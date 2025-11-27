@@ -9,7 +9,7 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-<div class="bg-yellow-200 min-h-screen">
+<div class="bg-slate-100 min-h-screen">
 	<div class="p-4 fixed right-0 bottom-2">
 		<nav>
 			<ul class="flex items-center gap-2">
