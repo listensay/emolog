@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { UserService } from '../../user/user.service';
 
 export interface JwtPayload {
-  sub: number; // 用户 ID
+  sub: number;
   username: string;
   email: string;
 }
@@ -19,7 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET') || 'default-secret',
+      secretOrKey: configService.get<string>('JWT_SECRET') || '',
     });
   }
 
