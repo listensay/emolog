@@ -1,8 +1,45 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
+import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+
+  // 全局验证管道
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // 自动删除未在 DTO 中定义的属性
+      transform: true, // 自动转换类型
+      forbidNonWhitelisted: true, // 当有未定义属性时抛出错误
+    }),
+  );
+
+  // 全局响应拦截器
+  app.useGlobalInterceptors(new TransformInterceptor());
+
+  // 全局异常过滤器
+  app.useGlobalFilters(new HttpExceptionFilter());
+
+  // 创建 Swagger 文档配置
+  const config = new DocumentBuilder()
+    .setTitle('API 文档')
+    .setDescription('NestJS 项目的 Swagger API 文档')
+    .setVersion('1.0')
+    .addBearerAuth() // 添加 JWT 认证
+    .build();
+
+  // 生成文档
+  const document = SwaggerModule.createDocument(app, config);
+
+  // 挂载 Swagger UI
+  SwaggerModule.setup('api', app, document);
+
+  await app.listen(process.env.PORT ?? 8080, '0.0.0.0');
+  console.log(`Application is running on: ${await app.getUrl()}`);
+  console.log(`Swagger UI is running on: ${await app.getUrl()}/api`);
 }
+
 bootstrap();
