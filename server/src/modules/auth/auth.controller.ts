@@ -14,7 +14,6 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { ResponseUtil } from '../../common/utils/response.util';
 import { Public } from '../../common/decorators/public.decorator';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
@@ -29,8 +28,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '登录成功' })
   @ApiResponse({ status: 401, description: '用户名或密码错误' })
   async login(@Body() loginDto: LoginDto) {
-    const result = await this.authService.login(loginDto);
-    return ResponseUtil.success(result, '登录成功');
+    return await this.authService.login(loginDto);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -40,6 +38,6 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '获取成功' })
   @ApiResponse({ status: 401, description: '未授权' })
   async getProfile(@Request() req) {
-    return ResponseUtil.success(req.user);
+    return req.user;
   }
 }

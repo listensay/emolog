@@ -14,7 +14,6 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ResponseUtil } from '../../common/utils/response.util';
 import { Public } from '../../common/decorators/public.decorator';
 
 @ApiTags('用户管理')
@@ -30,7 +29,7 @@ export class UserController {
   @ApiResponse({ status: 409, description: '用户名或邮箱已存在' })
   async register(@Body() createUserDto: CreateUserDto) {
     const user = await this.userService.create(createUserDto);
-    return ResponseUtil.created(user, '注册成功');
+    return user;
   }
 
   @Get()
@@ -46,13 +45,7 @@ export class UserController {
     @Query('page') page?: number,
     @Query('pageSize') pageSize?: number,
   ) {
-    const {
-      list,
-      total,
-      page: currentPage,
-      pageSize: currentPageSize,
-    } = await this.userService.findAll(page, pageSize);
-    return ResponseUtil.paginate(list, total, currentPage, currentPageSize);
+    return await this.userService.findAll(page, pageSize);
   }
 
   @Get(':id')
@@ -61,7 +54,7 @@ export class UserController {
   @ApiResponse({ status: 404, description: '用户不存在' })
   async findOne(@Param('id') id: string) {
     const user = await this.userService.findOne(+id);
-    return ResponseUtil.success(user);
+    return user;
   }
 
   @Patch(':id')
@@ -70,7 +63,7 @@ export class UserController {
   @ApiResponse({ status: 404, description: '用户不存在' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     const user = await this.userService.update(+id, updateUserDto);
-    return ResponseUtil.success(user, '更新成功');
+    return user;
   }
 
   @Delete(':id')
@@ -79,6 +72,6 @@ export class UserController {
   @ApiResponse({ status: 404, description: '用户不存在' })
   async remove(@Param('id') id: string) {
     await this.userService.remove(+id);
-    return ResponseUtil.success(null, '删除成功');
+    return null;
   }
 }
