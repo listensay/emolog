@@ -1,1 +1,73 @@
-<p>login page</p>
+<script lang="ts">
+import Input from '$lib/components/ui/Input.svelte';
+import Button from '$lib/components/ui/Button.svelte';
+import Form from '$lib/components/ui/Form.svelte';
+
+let email = $state('');
+let password = $state('');
+let isLoading = $state(false);
+
+async function handleSubmit(e: Event) {
+    e.preventDefault();
+    isLoading = true;
+    
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    
+    console.log('Login attempt:', { email, password });
+    isLoading = false;
+}
+</script>
+
+<div class="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+	<div class="w-full max-w-md space-y-8 bg-white p-8 border border-slate-200">
+		<div class="text-center">
+			<h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">
+				欢迎回来 👏
+			</h2>
+			<p class="mt-2 text-sm text-slate-600">
+                请输入您的账号密码后点击登录，即可开始使用工作台！
+			</p>
+		</div>
+
+		<Form onsubmit={handleSubmit}>
+			<div class="space-y-4">
+				<Input
+					id="email"
+					label="用户名或邮箱"
+					type="email"
+					placeholder="you@example.com"
+					bind:value={email}
+					required
+					autocomplete="email"
+				/>
+
+				<div class="space-y-1">
+					<Input
+						id="password"
+						label="密码"
+						type="password"
+						placeholder="••••••••"
+						bind:value={password}
+						required
+						autocomplete="current-password"
+					/>
+				</div>
+			</div>
+
+			<Button type="submit" class="w-full" loading={isLoading}>
+				登录
+			</Button>
+		</Form>
+
+		<div class="text-center text-sm">
+			<span class="text-slate-600">没有账号？</span>
+			<a
+				href="/auth/register"
+				class="font-medium text-indigo-600 hover:text-indigo-500 ml-1"
+			>
+				立即注册
+			</a>
+		</div>
+	</div>
+</div>
