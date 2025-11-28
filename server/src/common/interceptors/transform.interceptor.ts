@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ResponseDto, PaginationDto } from '../dto/response.dto';
+import { ResponseDto, PaginationDto, BusinessCode } from '../dto/response.dto';
 
 /**
  * 全局响应拦截器
@@ -42,11 +42,16 @@ export class TransformInterceptor<T>
             data.page,
             data.pageSize,
           );
-          return new ResponseDto(200, '操作成功', paginationData, true);
+          return new ResponseDto(
+            BusinessCode.SUCCESS,
+            '操作成功',
+            paginationData,
+            true,
+          );
         }
 
         // 否则包装为成功响应
-        return new ResponseDto(200, '操作成功', data, true);
+        return ResponseDto.success(data, '操作成功');
       }),
     );
   }
