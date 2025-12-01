@@ -5,6 +5,7 @@ import Form from '$lib/components/ui/Form.svelte';
 import { login } from '$lib/api/auth';
 import { goto } from '$app/navigation';
 import { toast } from '$lib/stores/toast';
+import { auth } from '$lib/stores/auth';
 
 let email = $state('');
 let password = $state('');
@@ -25,14 +26,9 @@ async function handleSubmit() {
             password
         });
 
-        // 保存 token 到 localStorage
-        if (response.data?.access_token) {
-            localStorage.setItem('token', response.data.access_token);
-        }
-
-        // 保存用户信息（可选）
-        if (response.data?.user) {
-            localStorage.setItem('user', JSON.stringify(response.data.user));
+        // 使用 auth store 保存登录状态
+        if (response.data?.access_token && response.data?.user) {
+            auth.login(response.data.access_token, response.data.user);
         }
 
         console.log('登录成功:', response);
