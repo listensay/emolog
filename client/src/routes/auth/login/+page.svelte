@@ -4,19 +4,16 @@ import Button from '$lib/components/ui/Button.svelte';
 import Form from '$lib/components/ui/Form.svelte';
 import { login } from '$lib/api/auth';
 import { goto } from '$app/navigation';
+import { toast } from '$lib/stores/toast';
 
 let email = $state('');
 let password = $state('');
 let isLoading = $state(false);
-let errorMessage = $state('');
 
 async function handleSubmit() {
-    // 清除之前的错误信息
-    errorMessage = '';
-
     // 表单验证
     if (!email || !password) {
-        errorMessage = '请输入用户名和密码';
+        toast.warning('请输入用户名和密码');
         return;
     }
 
@@ -40,11 +37,13 @@ async function handleSubmit() {
 
         console.log('登录成功:', response);
 
+        toast.success('登录成功!');
+
         // 跳转到首页或管理页面
         goto('/admin');
     } catch (error: any) {
         console.error('登录失败:', error);
-        errorMessage = error.message || '登录失败，请检查用户名和密码';
+        toast.error(error.message || '登录失败，请检查用户名和密码');
     } finally {
         isLoading = false;
     }
@@ -61,12 +60,6 @@ async function handleSubmit() {
                 请输入您的账号密码后点击登录，即可开始使用工作台！
 			</p>
 		</div>
-
-		{#if errorMessage}
-			<div class="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded text-sm">
-				{errorMessage}
-			</div>
-		{/if}
 
 		<Form onsubmit={handleSubmit}>
 			<div class="space-y-4">
