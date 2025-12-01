@@ -3,7 +3,7 @@ import type { HTMLFormAttributes } from 'svelte/elements';
 
 let { children, class: className, onsubmit, ...rest }: HTMLFormAttributes = $props();
 
-function handleSubmit(e: SubmitEvent) {
+function handleSubmit(e: any) {
 	e.preventDefault();
 
     if (onsubmit) {
