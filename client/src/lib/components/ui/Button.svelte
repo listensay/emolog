@@ -1,5 +1,6 @@
 <script lang="ts">
 import type { HTMLButtonAttributes } from 'svelte/elements';
+import { presets } from '$lib/theme';
 
 let {
     children,
@@ -14,7 +15,7 @@ let {
 } = $props();
 
 const variants = {
-    primary: 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm',
+    primary: presets.buttonPrimary,
     secondary: 'bg-slate-100 text-slate-900 hover:bg-slate-200',
     outline: 'border border-slate-300 bg-transparent hover:bg-slate-100 text-slate-700',
     ghost: 'hover:bg-slate-100 text-slate-700'
