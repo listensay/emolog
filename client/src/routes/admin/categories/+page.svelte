@@ -2,41 +2,41 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import { goto } from '$app/navigation';
 	import { toast } from '$lib/stores/toast';
-	import { getPostList, deletePost } from '$lib/api/post';
-	import type { Post } from '$lib/api/post';
+	import { getCategoryList, deleteCategory } from '$lib/api/category';
+	import type { Category } from '$lib/api/category';
 	import { onMount } from 'svelte';
 
-	let posts: Post[] = $state([]);
+	let categories: Category[] = $state([]);
 	let isLoading = $state(false);
 	let currentPage = $state(1);
 	let pageSize = $state(10);
 	let total = $state(0);
 
 	let searchQuery = $state('');
-	let selectedPosts = $state<number[]>([]);
+	let selectedCategories = $state<number[]>([]);
 
-	const filteredPosts = $derived(
-		posts.filter((post) => {
+	const filteredCategories = $derived(
+		categories.filter((category) => {
 			const matchSearch =
 				searchQuery === '' ||
-				post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-				(post.author?.username || '').toLowerCase().includes(searchQuery.toLowerCase());
+				category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				(category.description || '').toLowerCase().includes(searchQuery.toLowerCase());
 			return matchSearch;
 		})
 	);
 
 	onMount(async () => {
-		await loadPosts();
+		await loadCategories();
 	});
 
-	async function loadPosts() {
+	async function loadCategories() {
 		isLoading = true;
 		try {
-			const response = await getPostList(currentPage, pageSize);
-			posts = response.data.list;
+			const response = await getCategoryList(currentPage, pageSize);
+			categories = response.data.list;
 			total = response.data.total;
 		} catch (error) {
-			toast.error('加载文章失败');
+			toast.error('加载分类失败');
 			console.error(error);
 		} finally {
 			isLoading = false;
@@ -46,25 +46,25 @@
 	function handleSelectAll(e: Event) {
 		const checked = (e.target as HTMLInputElement).checked;
 		if (checked) {
-			selectedPosts = filteredPosts.map((p) => p.id);
+			selectedCategories = filteredCategories.map((c) => c.id);
 		} else {
-			selectedPosts = [];
+			selectedCategories = [];
 		}
 	}
 
-	function handleSelectPost(id: number) {
-		if (selectedPosts.includes(id)) {
-			selectedPosts = selectedPosts.filter((p) => p !== id);
+	function handleSelectCategory(id: number) {
+		if (selectedCategories.includes(id)) {
+			selectedCategories = selectedCategories.filter((c) => c !== id);
 		} else {
-			selectedPosts = [...selectedPosts, id];
+			selectedCategories = [...selectedCategories, id];
 		}
 	}
 
 	async function handleDelete(id: number) {
-		if (confirm('确定要删除这篇文章吗?')) {
+		if (confirm('确定要删除这个分类吗?')) {
 			try {
-				await deletePost(id);
-				posts = posts.filter((p) => p.id !== id);
+				await deleteCategory(id);
+				categories = categories.filter((c) => c.id !== id);
 				toast.success('删除成功');
 			} catch (error) {
 				toast.error('删除失败');
@@ -74,26 +74,21 @@
 	}
 
 	async function handleBatchDelete() {
-		if (selectedPosts.length === 0) {
-			toast.warning('请先选择要删除的文章');
+		if (selectedCategories.length === 0) {
+			toast.warning('请先选择要删除的分类');
 			return;
 		}
-		if (confirm(`确定要删除选中的 ${selectedPosts.length} 篇文章吗?`)) {
+		if (confirm(`确定要删除选中的 ${selectedCategories.length} 个分类吗?`)) {
 			try {
-				await Promise.all(selectedPosts.map((id) => deletePost(id)));
-				posts = posts.filter((p) => !selectedPosts.includes(p.id));
-				selectedPosts = [];
+				await Promise.all(selectedCategories.map((id) => deleteCategory(id)));
+				categories = categories.filter((c) => !selectedCategories.includes(c.id));
+				selectedCategories = [];
 				toast.success('批量删除成功');
 			} catch (error) {
 				toast.error('删除失败');
 				console.error(error);
 			}
 		}
-	}
-
-	function getStatusBadge(post: Post) {
-		if (post.isDeleted) return { text: '已删除', color: 'bg-red-100 text-red-800' };
-		return { text: '已发布', color: 'bg-green-100 text-green-800' };
 	}
 
 	function formatDate(date: string) {
@@ -105,10 +100,10 @@
 	<!-- 页面标题 -->
 	<div class="flex items-center justify-between">
 		<div>
-			<h1 class="text-2xl font-bold text-slate-900">文章管理</h1>
-			<p class="text-sm text-slate-500 mt-1">管理你的所有文章</p>
+			<h1 class="text-2xl font-bold text-slate-900">分类管理</h1>
+			<p class="text-sm text-slate-500 mt-1">管理你的所有分类</p>
 		</div>
-		<Button onclick={() => goto('/admin/posts/new')}>
+		<Button onclick={() => goto('/admin/categories/new')}>
 			<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path
 					stroke-linecap="round"
@@ -117,7 +112,7 @@
 					d="M12 4v16m8-8H4"
 				></path>
 			</svg>
-			新建文章
+			新建分类
 		</Button>
 	</div>
 
@@ -130,7 +125,7 @@
 					<input
 						type="text"
 						bind:value={searchQuery}
-						placeholder="搜索文章标题或作者..."
+						placeholder="搜索分类名称或描述..."
 						class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
 					/>
 					<svg
@@ -150,22 +145,22 @@
 			</div>
 
 			<!-- 批量操作 -->
-			{#if selectedPosts.length > 0}
+			{#if selectedCategories.length > 0}
 				<Button variant="outline" onclick={handleBatchDelete} class="text-red-600 border-red-300">
-					删除选中 ({selectedPosts.length})
+					删除选中 ({selectedCategories.length})
 				</Button>
 			{/if}
 		</div>
 	</div>
 
-	<!-- 文章列表 -->
+	<!-- 分类列表 -->
 	<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
 		<div class="overflow-x-auto">
 			{#if isLoading}
 				<div class="px-6 py-12 text-center text-slate-500">
 					<p>加载中...</p>
 				</div>
-			{:else if filteredPosts.length === 0}
+			{:else if filteredCategories.length === 0}
 				<div class="px-6 py-12 text-center text-slate-500">
 					<div class="flex flex-col items-center">
 						<svg
@@ -178,11 +173,11 @@
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								stroke-width="2"
-								d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+								d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
 							></path>
 						</svg>
-						<p class="text-lg font-medium">暂无文章</p>
-						<p class="text-sm mt-1">创建你的第一篇文章吧!</p>
+						<p class="text-lg font-medium">暂无分类</p>
+						<p class="text-sm mt-1">创建你的第一个分类吧!</p>
 					</div>
 				</div>
 			{:else}
@@ -193,29 +188,25 @@
 								<input
 									type="checkbox"
 									onchange={handleSelectAll}
-									checked={selectedPosts.length === filteredPosts.length && filteredPosts.length > 0}
+									checked={selectedCategories.length === filteredCategories.length &&
+										filteredCategories.length > 0}
 									class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
 								/>
 							</th>
 							<th
 								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
 							>
-								标题
+								名称
 							</th>
 							<th
 								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
 							>
-								状态
+								描述
 							</th>
 							<th
 								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
 							>
-								数据
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								作者
+								排序
 							</th>
 							<th
 								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
@@ -230,47 +221,45 @@
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-slate-200">
-						{#each filteredPosts as post (post.id)}
+						{#each filteredCategories as category (category.id)}
 							<tr class="hover:bg-slate-50 transition-colors">
 								<td class="px-6 py-4">
 									<input
 										type="checkbox"
-										checked={selectedPosts.includes(post.id)}
-										onchange={() => handleSelectPost(post.id)}
+										checked={selectedCategories.includes(category.id)}
+										onchange={() => handleSelectCategory(category.id)}
 										class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
 									/>
 								</td>
 								<td class="px-6 py-4">
-									<div class="text-sm font-medium text-slate-900">{post.title}</div>
-									<div class="text-xs text-slate-500 mt-1">{post.description}</div>
-								</td>
-								<td class="px-6 py-4">
-									<span class="px-2 py-1 text-xs rounded-full {getStatusBadge(post).color}">
-										{getStatusBadge(post).text}
-									</span>
-								</td>
-								<td class="px-6 py-4">
-									<div class="text-xs text-slate-600">
-										<div>👁️ {post.views}</div>
-										<div>❤️ {post.likes}</div>
+									<div class="flex items-center">
+										{#if category.icon}
+											<span class="mr-2">{category.icon}</span>
+										{/if}
+										<span class="text-sm font-medium text-slate-900">{category.name}</span>
 									</div>
 								</td>
 								<td class="px-6 py-4">
-									<div class="text-sm text-slate-600">{post.author?.username || '未知'}</div>
+									<div class="text-sm text-slate-600 max-w-xs truncate">
+										{category.description || '-'}
+									</div>
 								</td>
 								<td class="px-6 py-4">
-									<div class="text-sm text-slate-600">{formatDate(post.createdAt)}</div>
+									<span class="text-sm text-slate-600">{category.order}</span>
+								</td>
+								<td class="px-6 py-4">
+									<div class="text-sm text-slate-600">{formatDate(category.createdAt)}</div>
 								</td>
 								<td class="px-6 py-4 text-right">
 									<div class="flex items-center justify-end gap-2">
 										<button
-											onclick={() => goto(`/admin/posts/${post.id}`)}
+											onclick={() => goto(`/admin/categories/${category.id}`)}
 											class="text-emerald-600 hover:text-emerald-900 text-sm font-medium"
 										>
 											编辑
 										</button>
 										<button
-											onclick={() => handleDelete(post.id)}
+											onclick={() => handleDelete(category.id)}
 											class="text-red-600 hover:text-red-900 text-sm font-medium"
 										>
 											删除
@@ -285,10 +274,10 @@
 		</div>
 
 		<!-- 分页 -->
-		{#if !isLoading && filteredPosts.length > 0}
+		{#if !isLoading && filteredCategories.length > 0}
 			<div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
 				<div class="text-sm text-slate-600">
-					显示 {filteredPosts.length} / {total} 条结果
+					显示 {filteredCategories.length} / {total} 条结果
 				</div>
 				<div class="flex gap-2">
 					<Button
@@ -296,15 +285,19 @@
 						disabled={currentPage === 1}
 						onclick={() => {
 							currentPage--;
-							loadPosts();
+							loadCategories();
 						}}
 					>
 						上一页
 					</Button>
-					<Button variant="outline" disabled={currentPage * pageSize >= total} onclick={() => {
-						currentPage++;
-						loadPosts();
-					}}>
+					<Button
+						variant="outline"
+						disabled={currentPage * pageSize >= total}
+						onclick={() => {
+							currentPage++;
+							loadCategories();
+						}}
+					>
 						下一页
 					</Button>
 				</div>

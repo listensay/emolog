@@ -1,11 +1,6 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
-
-interface User {
-	id: string;
-	username: string;
-	email: string;
-}
+import type { User } from '$lib/types/user';
 
 interface AuthState {
 	isAuthenticated: boolean;

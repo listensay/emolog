@@ -6,7 +6,7 @@
  * 用户信息
  */
 export interface User {
-	id: string;
+	id: number;
 	username: string;
 	email: string;
 	nickname?: string;

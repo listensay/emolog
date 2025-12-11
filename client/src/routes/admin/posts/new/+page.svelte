@@ -1,52 +1,120 @@
 <script lang="ts">
-import Button from '$lib/components/ui/Button.svelte';
-import Input from '$lib/components/ui/Input.svelte';
-import { goto } from '$app/navigation';
-import { toast } from '$lib/stores/toast';
+	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
+	import TiptapEditor from '$lib/components/TiptapEditor.svelte';
+	import { goto } from '$app/navigation';
+	import { toast } from '$lib/stores/toast';
+	import { createPost } from '$lib/api/post';
+	import { getAllCategories, type Category } from '$lib/api/category';
+	import { getAllTags, createTag, type Tag } from '$lib/api/tag';
+	import { auth } from '$lib/stores/auth';
+	import { onMount } from 'svelte';
 
-let title = $state('');
-let category = $state('');
-let tags = $state('');
-let content = $state('');
-let status = $state('draft');
-let coverImage = $state('');
-let isLoading = $state(false);
+	let title = $state('');
+	let description = $state('');
+	let content = $state('');
+	let categoryId = $state('');
+	let coverImage = $state('');
+	let isLoading = $state(false);
+	let categories = $state<Category[]>([]);
+	let tags = $state<Tag[]>([]);
+	let selectedTagIds = $state<number[]>([]);
+	let newTagName = $state('');
+	let isCreatingTag = $state(false);
 
-async function handleSubmit() {
-	if (!title.trim()) {
-		toast.warning('请输入文章标题');
-		return;
+	onMount(async () => {
+		try {
+			const [categoryResponse, tagResponse] = await Promise.all([
+				getAllCategories(),
+				getAllTags()
+			]);
+			categories = categoryResponse.data;
+			tags = tagResponse.data;
+			if (categories.length > 0) {
+				categoryId = categories[0].id.toString();
+			}
+		} catch (error) {
+			console.error('加载数据失败', error);
+		}
+	});
+
+	function toggleTag(tagId: number) {
+		if (selectedTagIds.includes(tagId)) {
+			selectedTagIds = selectedTagIds.filter((id) => id !== tagId);
+		} else {
+			selectedTagIds = [...selectedTagIds, tagId];
+		}
 	}
 
-	if (!content.trim()) {
-		toast.warning('请输入文章内容');
-		return;
+	async function handleCreateTag() {
+		if (!newTagName.trim()) {
+			toast.warning('请输入标签名称');
+			return;
+		}
+
+		isCreatingTag = true;
+		try {
+			const response = await createTag({ name: newTagName.trim() });
+			tags = [...tags, response.data];
+			selectedTagIds = [...selectedTagIds, response.data.id];
+			newTagName = '';
+			toast.success('标签创建成功');
+		} catch (error: any) {
+			toast.error(error.message || '创建标签失败');
+		} finally {
+			isCreatingTag = false;
+		}
 	}
 
-	isLoading = true;
+	async function handleSubmit() {
+		if (!title.trim()) {
+			toast.warning('请输入文章标题');
+			return;
+		}
 
-	try {
-		// 模拟保存
-		await new Promise((resolve) => setTimeout(resolve, 1000));
+		if (!content.trim()) {
+			toast.warning('请输入文章内容');
+			return;
+		}
 
-		toast.success('文章创建成功!');
-		goto('/admin/posts');
-	} catch (error) {
-		toast.error('创建失败,请重试');
-	} finally {
-		isLoading = false;
+		if (!$auth.user?.id) {
+			toast.error('请先登录');
+			goto('/auth/login');
+			return;
+		}
+
+		isLoading = true;
+
+		try {
+			await createPost({
+				title: title.trim(),
+				content,
+				cover: coverImage || undefined,
+				description: description.trim() || undefined,
+				authorId: $auth.user?.id || 0,
+				categoryId: parseInt(categoryId) || 1,
+				tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined
+			});
+
+			toast.success('文章创建成功!');
+			goto('/admin/posts');
+		} catch (error) {
+			toast.error('创建失败,请重试');
+			console.error(error);
+		} finally {
+			isLoading = false;
+		}
 	}
-}
 
-function handleCancel() {
-	if (title || content) {
-		if (confirm('确定要放弃编辑吗?未保存的内容将丢失。')) {
+	function handleCancel() {
+		if (title || content) {
+			if (confirm('确定要放弃编辑吗?未保存的内容将丢失。')) {
+				goto('/admin/posts');
+			}
+		} else {
 			goto('/admin/posts');
 		}
-	} else {
-		goto('/admin/posts');
 	}
-}
 </script>
 
 <div class="max-w-5xl mx-auto space-y-6">
@@ -86,14 +154,30 @@ function handleCancel() {
 				/>
 
 				<div>
-					<label class="block text-sm font-medium text-slate-700 mb-2">文章内容</label>
+					<label for="description" class="block text-sm font-medium text-slate-700 mb-2">
+						文章描述
+					</label>
 					<textarea
-						bind:value={content}
-						placeholder="开始写作..."
-						rows="20"
-						class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none font-mono text-sm"
+						id="description"
+						bind:value={description}
+						placeholder="简要描述文章内容..."
+						rows="3"
+						class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
 					></textarea>
+					<p class="text-xs text-slate-500 mt-1">这将显示在文章列表中</p>
 				</div>
+			</div>
+
+			<!-- 内容编辑 -->
+			<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+				<h2 class="text-lg font-semibold text-slate-900">文章内容</h2>
+				<TiptapEditor
+					bind:content
+					class="text-base"
+				/>
+				<p class="text-xs text-slate-500">
+					快捷键: Ctrl+B(粗体) | Ctrl+I(斜体) | Ctrl+U(下划线)
+				</p>
 			</div>
 		</div>
 
@@ -104,15 +188,62 @@ function handleCancel() {
 				<h3 class="text-lg font-semibold text-slate-900">发布设置</h3>
 
 				<div>
-					<label class="block text-sm font-medium text-slate-700 mb-2">状态</label>
+					<label for="categoryId" class="block text-sm font-medium text-slate-700 mb-2">
+						分类
+					</label>
 					<select
-						bind:value={status}
+						id="categoryId"
+						bind:value={categoryId}
 						class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
 					>
-						<option value="draft">草稿</option>
-						<option value="published">已发布</option>
-						<option value="pending">待审核</option>
+						{#if categories.length === 0}
+							<option value="">加载中...</option>
+						{:else}
+							{#each categories as category}
+								<option value={category.id.toString()}>{category.name}</option>
+							{/each}
+						{/if}
 					</select>
+				</div>
+
+				<!-- 标签选择 -->
+				<div>
+					<label class="block text-sm font-medium text-slate-700 mb-2">标签</label>
+					<div class="flex flex-wrap gap-2 mb-3">
+						{#each tags as tag (tag.id)}
+							<button
+								type="button"
+								onclick={() => toggleTag(tag.id)}
+								class="px-3 py-1 text-sm rounded-full transition-colors {selectedTagIds.includes(
+									tag.id
+								)
+									? 'bg-emerald-600 text-white'
+									: 'bg-slate-100 text-slate-700 hover:bg-slate-200'}"
+							>
+								{tag.name}
+							</button>
+						{/each}
+						{#if tags.length === 0}
+							<span class="text-sm text-slate-400">暂无标签</span>
+						{/if}
+					</div>
+					<div class="flex gap-2">
+						<input
+							type="text"
+							bind:value={newTagName}
+							placeholder="新建标签..."
+							class="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+							onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), handleCreateTag())}
+						/>
+						<Button
+							variant="outline"
+							onclick={handleCreateTag}
+							loading={isCreatingTag}
+							class="text-sm px-3 py-1.5"
+						>
+							添加
+						</Button>
+					</div>
 				</div>
 
 				<div class="pt-4 border-t border-slate-200 space-y-2">
@@ -122,37 +253,14 @@ function handleCancel() {
 						loading={isLoading}
 						class="w-full"
 					>
-						{status === 'published' ? '发布文章' : '保存草稿'}
+						发布文章
+					</Button>
+					<Button variant="outline" onclick={handleCancel} class="w-full">
+						保存草稿
 					</Button>
 					<Button variant="outline" onclick={handleCancel} class="w-full">
 						取消
 					</Button>
-				</div>
-			</div>
-
-			<!-- 分类和标签 -->
-			<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
-				<h3 class="text-lg font-semibold text-slate-900">分类和标签</h3>
-
-				<Input
-					id="category"
-					label="分类"
-					bind:value={category}
-					placeholder="例如: 技术"
-				/>
-
-				<div>
-					<label for="tags" class="block text-sm font-medium text-slate-700 mb-2">
-						标签
-					</label>
-					<input
-						id="tags"
-						type="text"
-						bind:value={tags}
-						placeholder="多个标签用逗号分隔"
-						class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-					/>
-					<p class="text-xs text-slate-500 mt-1">例如: JavaScript, Web, 前端</p>
 				</div>
 			</div>
 
@@ -195,11 +303,18 @@ function handleCancel() {
 				<div class="space-y-2 text-sm">
 					<div class="flex justify-between">
 						<span class="text-slate-600">字数</span>
-						<span class="font-medium">{content.length}</span>
+						<span class="font-medium">{content.replace(/<[^>]*>/g, '').length}</span>
 					</div>
 					<div class="flex justify-between">
 						<span class="text-slate-600">预计阅读</span>
-						<span class="font-medium">{Math.ceil(content.length / 500)} 分钟</span>
+						<span class="font-medium">
+							{Math.ceil(content.replace(/<[^>]*>/g, '').length / 500)}
+							分钟
+						</span>
+					</div>
+					<div class="flex justify-between">
+						<span class="text-slate-600">HTML字节</span>
+						<span class="font-medium">{content.length}</span>
 					</div>
 				</div>
 			</div>

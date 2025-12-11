@@ -3,7 +3,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { PostModule } from './modules/post/post.module';
+import { CategoryModule } from './modules/category/category.module';
+import { TagModule } from './modules/tag/tag.module';
 import { User } from './modules/user/entities/user.entity';
+import { Post } from './modules/post/entities/post.entity';
+import { Category } from './modules/category/entities/category.entity';
+import { Tag } from './modules/tag/entities/tag.entity';
 
 @Module({
   imports: [
@@ -21,13 +27,16 @@ import { User } from './modules/user/entities/user.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User],
+        entities: [User, Post, Category, Tag],
         synchronize: true,
       }),
       inject: [ConfigService],
     }),
     UserModule,
     AuthModule,
+    PostModule,
+    CategoryModule,
+    TagModule,
   ],
 })
 export class AppModule {}
