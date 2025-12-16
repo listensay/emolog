@@ -1,29 +1,109 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { createEditor, EditorContent, BubbleMenu } from 'svelte-tiptap';
+	import { onMount, onDestroy } from 'svelte';
+	import { createEditor, EditorContent, BubbleMenu, FloatingMenu } from 'svelte-tiptap';
 	import StarterKit from '@tiptap/starter-kit';
 	import Placeholder from '@tiptap/extension-placeholder';
 	import Link from '@tiptap/extension-link';
 	import Underline from '@tiptap/extension-underline';
 	import Highlight from '@tiptap/extension-highlight';
+	import TaskList from '@tiptap/extension-task-list';
+	import TaskItem from '@tiptap/extension-task-item';
+	import Image from '@tiptap/extension-image';
+	import { Table } from '@tiptap/extension-table';
+	import { TableCell } from '@tiptap/extension-table-cell';
+	import { TableHeader } from '@tiptap/extension-table-header';
+	import { TableRow } from '@tiptap/extension-table-row';
 
 	let { content = $bindable(''), readonly = false, class: className = '' } = $props();
 
 	let editor = $state(null as any);
 	let editorReady = $state(false);
+	
+	// Slash Menu State
 	let showSlashMenu = $state(false);
 	let slashQuery = $state('');
+	let slashMenuPos = $state({ top: 0, left: 0 });
+	let selectedIndex = $state(0);
+	let slashMenuRef = $state(null as HTMLElement | null);
 
 	const slashCommands = [
-		{ label: '标题 1', command: (editor: any) => editor.commands.toggleHeading({ level: 1 }), icon: '# ' },
-		{ label: '标题 2', command: (editor: any) => editor.commands.toggleHeading({ level: 2 }), icon: '## ' },
-		{ label: '标题 3', command: (editor: any) => editor.commands.toggleHeading({ level: 3 }), icon: '### ' },
-		{ label: '正文', command: (editor: any) => editor.commands.setParagraph(), icon: '¶' },
-		{ label: '项目符号列表', command: (editor: any) => editor.commands.toggleBulletList(), icon: '•' },
-		{ label: '编号列表', command: (editor: any) => editor.commands.toggleOrderedList(), icon: '1.' },
-		{ label: '引用', command: (editor: any) => editor.commands.toggleBlockquote(), icon: '❝' },
-		{ label: '代码块', command: (editor: any) => editor.commands.toggleCodeBlock(), icon: '</>' },
-		{ label: '分隔线', command: (editor: any) => editor.commands.setHorizontalRule(), icon: '—' },
+		{ 
+			id: 'text',
+			label: 'Text', 
+			desc: 'Start writing with plain text.',
+			command: (editor: any) => editor.chain().focus().setParagraph().run(), 
+			icon: '📝' 
+		},
+		{ 
+			id: 'heading1',
+			label: 'Heading 1', 
+			desc: 'Big section heading.',
+			command: (editor: any) => editor.chain().focus().toggleHeading({ level: 1 }).run(), 
+			icon: 'H1' 
+		},
+		{ 
+			id: 'heading2',
+			label: 'Heading 2', 
+			desc: 'Medium section heading.',
+			command: (editor: any) => editor.chain().focus().toggleHeading({ level: 2 }).run(), 
+			icon: 'H2' 
+		},
+		{ 
+			id: 'heading3',
+			label: 'Heading 3', 
+			desc: 'Small section heading.',
+			command: (editor: any) => editor.chain().focus().toggleHeading({ level: 3 }).run(), 
+			icon: 'H3' 
+		},
+		{ 
+			id: 'bulletRequest',
+			label: 'Bullet List', 
+			desc: 'Create a simple bulleted list.',
+			command: (editor: any) => editor.chain().focus().toggleBulletList().run(), 
+			icon: '•' 
+		},
+		{ 
+			id: 'orderedList',
+			label: 'Numbered List', 
+			desc: 'Create a list with numbering.',
+			command: (editor: any) => editor.chain().focus().toggleOrderedList().run(), 
+			icon: '1.' 
+		},
+		{ 
+			id: 'taskList',
+			label: 'To-do List', 
+			desc: 'Track tasks with a to-do list.',
+			command: (editor: any) => editor.chain().focus().toggleTaskList().run(), 
+			icon: '☐' 
+		},
+		{ 
+			id: 'blockquote',
+			label: 'Quote', 
+			desc: 'Capture a quote.',
+			command: (editor: any) => editor.chain().focus().toggleBlockquote().run(), 
+			icon: '❝' 
+		},
+		{ 
+			id: 'codeBlock',
+			label: 'Code', 
+			desc: 'Capture a code snippet.',
+			command: (editor: any) => editor.chain().focus().toggleCodeBlock().run(), 
+			icon: '</>' 
+		},
+		{ 
+			id: 'divider',
+			label: 'Divider', 
+			desc: 'Visually divide blocks.',
+			command: (editor: any) => editor.chain().focus().setHorizontalRule().run(), 
+			icon: '—' 
+		},
+        { 
+			id: 'image',
+			label: 'Image', 
+			desc: 'Upload or embed an image.',
+			command: (editor: any) => addImage(), 
+			icon: '🖼️' 
+		}
 	];
 
 	let filteredCommands = $state(slashCommands);
@@ -32,34 +112,68 @@
 		const editorStore = createEditor({
 			extensions: [
 				StarterKit.configure({
-					bulletList: {
-						keepMarks: true,
-						keepAttributes: false
-					},
-					orderedList: {
-						keepMarks: true,
-						keepAttributes: false
-					},
-					heading: {
-						levels: [1, 2, 3]
-					}
+					bulletList: { keepMarks: true, keepAttributes: false },
+					orderedList: { keepMarks: true, keepAttributes: false },
+					heading: { levels: [1, 2, 3] },
+					dropcursor: { color: '#0ea5e9', width: 2 }
 				}),
-				Link.configure({
-					openOnClick: false,
-					autolink: true
-				}),
-				Placeholder.configure({
-					placeholder: '输入 "/" 获取更多选项...'
-				}),
+				TaskList,
+				TaskItem.configure({ nested: true }),
+				Link.configure({ openOnClick: false, autolink: true }),
+				Placeholder.configure({ placeholder: 'Type \'/\' for commands...' }),
 				Underline,
-				Highlight.configure({
-					multicolor: true
-				})
+				Highlight.configure({ multicolor: true }),
+				Image.configure({ inline: true }),
+				Table.configure({ resizable: true }),
+				TableRow,
+				TableHeader,
+				TableCell,
 			],
 			content: content || '',
 			editable: !readonly,
+			editorProps: {
+				attributes: {
+					class: 'prose prose-slate max-w-none focus:outline-none min-h-[300px] px-4 py-2'
+				},
+				handleKeyDown: (view, event) => {
+					if (showSlashMenu) {
+						if (event.key === 'ArrowUp') {
+							event.preventDefault();
+							selectedIndex = (selectedIndex - 1 + filteredCommands.length) % filteredCommands.length;
+							return true;
+						}
+						if (event.key === 'ArrowDown') {
+							event.preventDefault();
+							selectedIndex = (selectedIndex + 1) % filteredCommands.length;
+							return true;
+						}
+						if (event.key === 'Enter') {
+							event.preventDefault();
+							executeCommand(filteredCommands[selectedIndex]);
+							return true;
+						}
+						if (event.key === 'Escape') {
+							showSlashMenu = false;
+							return true;
+						}
+					}
+					// Trigger slash menu
+					if (event.key === '/' && !showSlashMenu) {
+						// Don't default prevent immediately, let the slash be typed, then check context
+						// We'll handle this in onUpdate or slightly later
+					}
+					return false;
+				}
+			},
 			onUpdate: ({ editor: ed }) => {
 				content = ed.getHTML();
+				handleSlashMenuCheck(ed);
+			},
+			onSelectionUpdate: ({ editor: ed }) => {
+				handleSlashMenuCheck(ed);
+			},
+			onTransaction: () => {
+				// force update if needed
 			}
 		});
 
@@ -76,577 +190,338 @@
 		};
 	});
 
-	function handleKeyDown(e: KeyboardEvent) {
-		if (e.key === '/') {
-			e.preventDefault();
-			showSlashMenu = !showSlashMenu;
-			slashQuery = '';
-			filteredCommands = slashCommands;
+	function handleSlashMenuCheck(ed: any) {
+		if (!ed) return;
+		
+		const { state, view } = ed;
+		const { selection } = state;
+		const { empty, from } = selection;
+
+		// Only show if selection is empty (cursor)
+		if (!empty) {
+			showSlashMenu = false;
+			return;
+		}
+
+		const textBefore = state.doc.textBetween(Math.max(0, from - 20), from, '\n', '\0');
+		// Only trigger on '/' at start of line or after a space
+		const match = textBefore.match(/(?:^|\s)\/(.*)$/);
+		
+		if (match) {
+			const query = match[1];
+			filteredCommands = slashCommands.filter(cmd => 
+				cmd.label.toLowerCase().includes(query.toLowerCase()) || 
+				cmd.desc.toLowerCase().includes(query.toLowerCase())
+			);
+			
+			if (filteredCommands.length > 0) {
+				showSlashMenu = true;
+				slashQuery = query;
+				selectedIndex = 0;
+				
+				// Calculate position
+				const coords = view.coordsAtPos(from);
+				slashMenuPos = {
+					top: coords.bottom + 10, // Add some breathing room
+					left: coords.left
+				};
+			} else {
+				showSlashMenu = false;
+			}
+		} else {
+			showSlashMenu = false;
 		}
 	}
 
 	function executeCommand(cmd: any) {
-		if (editor) {
+		if (editor && cmd) {
+			// Delete the slash command text (e.g. "/heading")
+			const { state } = editor;
+			const { from } = state.selection;
+			
+			// We need to find where the slash started. 
+			// We know slashQuery is the text after slash.
+			const deleteRange = slashQuery.length + 1; // +1 for '/'
+
+			editor.chain().focus().deleteRange({ from: from - deleteRange, to: from }).run();
+			
+			// Execute
 			cmd.command(editor);
+			
 			showSlashMenu = false;
 			slashQuery = '';
-			editor.view.focus();
 		}
 	}
 
-	function filterCommands(query: string) {
-		if (!query) {
-			filteredCommands = slashCommands;
-		} else {
-			filteredCommands = slashCommands.filter((cmd) =>
-				cmd.label.toLowerCase().includes(query.toLowerCase())
-			);
-		}
-	}
-
-	function applyBold() {
-		if (editor) {
-			editor.commands.toggleBold();
-			editor.view.focus();
-		}
-	}
-
-	function applyItalic() {
-		if (editor) {
-			editor.commands.toggleItalic();
-			editor.view.focus();
-		}
-	}
-
-	function applyUnderline() {
-		if (editor) {
-			editor.commands.toggleUnderline();
-			editor.view.focus();
-		}
-	}
-
-	function applyStrike() {
-		if (editor) {
-			editor.commands.toggleStrike();
-			editor.view.focus();
-		}
-	}
-
-	function applyCode() {
-		if (editor) {
-			editor.commands.toggleCode();
-			editor.view.focus();
-		}
-	}
-
-	function applyHighlight() {
-		if (editor) {
-			editor.commands.toggleHighlight();
-			editor.view.focus();
-		}
-	}
-
-	function addLink() {
-		const url = prompt('输入链接地址:');
+	function addImage() {
+		const url = prompt('Image URL:');
 		if (url && editor) {
-			editor.commands.setLink({ href: url });
-			editor.view.focus();
+			editor.chain().focus().setImage({ src: url }).run();
 		}
 	}
 
-	function toggleBulletList() {
-		if (editor) {
-			editor.commands.toggleBulletList();
-			editor.view.focus();
+	// Helper for Bubble Menu and Floating Menu actions
+	const toggleBold = () => editor.chain().focus().toggleBold().run();
+	const toggleItalic = () => editor.chain().focus().toggleItalic().run();
+	const toggleStrike = () => editor.chain().focus().toggleStrike().run();
+	const toggleCode = () => editor.chain().focus().toggleCode().run();
+	
+	const setLink = () => {
+		const previousUrl = editor.getAttributes('link').href;
+		const url = window.prompt('URL', previousUrl);
+		
+		if (url === null) return;
+		if (url === '') {
+			editor.chain().focus().extendMarkRange('link').unsetLink().run();
+			return;
 		}
-	}
+		editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+	};
 
-	function toggleOrderedList() {
-		if (editor) {
-			editor.commands.toggleOrderedList();
-			editor.view.focus();
-		}
-	}
-
-	function toggleBlockquote() {
-		if (editor) {
-			editor.commands.toggleBlockquote();
-			editor.view.focus();
-		}
-	}
-
-	function toggleCodeBlock() {
-		if (editor) {
-			editor.commands.toggleCodeBlock();
-			editor.view.focus();
-		}
-	}
-
-	function insertHorizontalRule() {
-		if (editor) {
-			editor.commands.setHorizontalRule();
-			editor.view.focus();
-		}
-	}
+	// Floating menu actions
+	const floatHeading1 = () => editor.chain().focus().toggleHeading({ level: 1 }).run();
+	const floatBulletList = () => editor.chain().focus().toggleBulletList().run();
+	const floatTaskList = () => editor.chain().focus().toggleTaskList().run();
 </script>
 
-<div class="tiptap-container">
-	{#if !readonly && editor}
-		<!-- 工具栏 -->
-		<div class="editor-toolbar">
-			<div class="toolbar-group">
-				<button
-					onclick={applyBold}
-					title="粗体 (Ctrl+B)"
-					class={`toolbar-button ${editor.isActive('bold') ? 'active' : ''}`}
-					aria-label="粗体"
-				>
-					<strong>B</strong>
-				</button>
-				<button
-					onclick={applyItalic}
-					title="斜体 (Ctrl+I)"
-					class={`toolbar-button ${editor.isActive('italic') ? 'active' : ''}`}
-					aria-label="斜体"
-				>
-					<em>I</em>
-				</button>
-				<button
-					onclick={applyUnderline}
-					title="下划线 (Ctrl+U)"
-					class={`toolbar-button ${editor.isActive('underline') ? 'active' : ''}`}
-					aria-label="下划线"
-				>
-					<u>U</u>
-				</button>
-				<button
-					onclick={applyStrike}
-					title="删除线"
-					class={`toolbar-button ${editor.isActive('strike') ? 'active' : ''}`}
-					aria-label="删除线"
-				>
-					<s>S</s>
-				</button>
-				<button
-					onclick={applyCode}
-					title="代码"
-					class={`toolbar-button ${editor.isActive('code') ? 'active' : ''}`}
-					aria-label="代码"
-				>
-					<code>&lt;&gt;</code>
-				</button>
-			</div>
-
-			<div class="toolbar-divider"></div>
-
-			<div class="toolbar-group">
-				<button
-					onclick={addLink}
-					title="链接"
-					class={`toolbar-button ${editor.isActive('link') ? 'active' : ''}`}
-					aria-label="链接"
-				>
-					🔗
-				</button>
-				<button
-					onclick={applyHighlight}
-					title="高亮"
-					class={`toolbar-button ${editor.isActive('highlight') ? 'active' : ''}`}
-					aria-label="高亮"
-				>
-					🎨
-				</button>
-			</div>
-
-			<div class="toolbar-divider"></div>
-
-			<div class="toolbar-group">
-				<button
-					onclick={toggleBulletList}
-					title="项目符号列表"
-					class={`toolbar-button ${editor.isActive('bulletList') ? 'active' : ''}`}
-					aria-label="项目符号列表"
-				>
-					• 列表
-				</button>
-				<button
-					onclick={toggleOrderedList}
-					title="编号列表"
-					class={`toolbar-button ${editor.isActive('orderedList') ? 'active' : ''}`}
-					aria-label="编号列表"
-				>
-					1. 列表
-				</button>
-				<button
-					onclick={toggleBlockquote}
-					title="引用"
-					class={`toolbar-button ${editor.isActive('blockquote') ? 'active' : ''}`}
-					aria-label="引用"
-				>
-					❝
-				</button>
-				<button
-					onclick={toggleCodeBlock}
-					title="代码块"
-					class={`toolbar-button ${editor.isActive('codeBlock') ? 'active' : ''}`}
-					aria-label="代码块"
-				>
-					{'</>'} 块
-				</button>
-			</div>
-
-			<div class="toolbar-divider"></div>
-
-			<div class="toolbar-group">
-				<button
-					onclick={insertHorizontalRule}
-					title="分隔线"
-					class="toolbar-button"
-					aria-label="分隔线"
-				>
-					—
-				</button>
-			</div>
-		</div>
-	{/if}
-
-	<!-- 编辑器 -->
+<div class="notion-editor-container relative">
 	{#if editorReady && editor}
-		<div class="editor-wrapper" role="textbox" aria-multiline="true" tabindex={0} onkeydown={handleKeyDown}>
-			<EditorContent
-				{editor}
-				class="tiptap-editor prose prose-slate max-w-none {className}"
-			/>
+		{#if !readonly}
+			<BubbleMenu {editor} class="bubble-menu">
+				<button onclick={toggleBold} class:active={editor.isActive('bold')}>Bold</button>
+				<button onclick={toggleItalic} class:active={editor.isActive('italic')}>Italic</button>
+				<button onclick={toggleStrike} class:active={editor.isActive('strike')}>Strike</button>
+				<button onclick={toggleCode} class:active={editor.isActive('code')}>Code</button>
+				<button onclick={setLink} class:active={editor.isActive('link')}>Link</button>
+			</BubbleMenu>
 
-			<!-- 浮动菜单 - 在选中文本时显示 -->
-			{#if !readonly}
-				<BubbleMenu
-					{editor}
-					class="bubble-menu"
-				>
-					<div class="bubble-menu-content">
-						<button
-							onclick={applyBold}
-							class={`bubble-button ${editor.isActive('bold') ? 'active' : ''}`}
-							aria-label="粗体"
-						>
-							<strong>B</strong>
-						</button>
-						<button
-							onclick={applyItalic}
-							class={`bubble-button ${editor.isActive('italic') ? 'active' : ''}`}
-							aria-label="斜体"
-						>
-							<em>I</em>
-						</button>
-						<button
-							onclick={applyUnderline}
-							class={`bubble-button ${editor.isActive('underline') ? 'active' : ''}`}
-							aria-label="下划线"
-						>
-							<u>U</u>
-						</button>
-						<button onclick={addLink} class="bubble-button" aria-label="链接">
-							🔗
-						</button>
-					</div>
-				</BubbleMenu>
-			{/if}
+			<FloatingMenu {editor} class="floating-menu">
+				<button onclick={floatHeading1} class:active={editor.isActive('heading', { level: 1 })}>H1</button>
+				<button onclick={floatBulletList} class:active={editor.isActive('bulletList')}>List</button>
+				<button onclick={floatTaskList} class:active={editor.isActive('taskList')}>To-do</button>
+                <button onclick={addImage}>Img</button>
+			</FloatingMenu>
+		{/if}
+
+		<div class="editor-scroll-area">
+			<EditorContent {editor} />
 		</div>
 
-		<!-- 斜杠命令菜单 -->
 		{#if showSlashMenu}
-			<div class="slash-menu">
-				<div class="slash-menu-header">
-					<input
-						type="text"
-						placeholder="搜索命令..."
-						bind:value={slashQuery}
-						onchange={() => filterCommands(slashQuery)}
-						oninput={() => filterCommands(slashQuery)}
-						class="slash-search"
-					/>
-				</div>
-				<div class="slash-menu-items">
-					{#each filteredCommands as command (command.label)}
-						<button
-							class="slash-menu-item"
-							onclick={() => executeCommand(command)}
+			<div 
+				class="slash-menu-portal"
+				style="top: {slashMenuPos.top}px; left: {slashMenuPos.left}px;"
+				bind:this={slashMenuRef}
+			>
+				<div class="slash-menu-list">
+					<div class="slash-menu-header">Basic blocks</div>
+					{#each filteredCommands as cmd, i}
+						<button 
+							class="slash-menu-item" 
+							class:selected={i === selectedIndex}
+							onclick={() => executeCommand(cmd)}
+							onmouseenter={() => selectedIndex = i}
 						>
-							<span class="slash-icon">{command.icon}</span>
-							<span class="slash-label">{command.label}</span>
+							<div class="cmd-icon">{cmd.icon}</div>
+							<div class="cmd-info">
+								<div class="cmd-label">{cmd.label}</div>
+								<div class="cmd-desc">{cmd.desc}</div>
+							</div>
 						</button>
 					{/each}
+					{#if filteredCommands.length === 0}
+						<div class="p-2 text-gray-400 text-sm">No commands found</div>
+					{/if}
 				</div>
 			</div>
 		{/if}
 	{:else}
-		<div class="editor-loading">
-			加载编辑器中...
-		</div>
+		<div class="loading">Loading Editor...</div>
 	{/if}
 </div>
 
 <style>
-	.tiptap-container {
-		display: flex;
-		flex-direction: column;
-		width: 100%;
-		border: 1px solid #e2e8f0;
-		border-radius: 0.5rem;
-		overflow: hidden;
-		background: white;
+	/* Container Styles */
+	.notion-editor-container {
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
+		color: #37352f;
+		line-height: 1.5;
+        width: 100%;
+        min-height: 300px;
 	}
 
-	.editor-toolbar {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		padding: 0.75rem;
-		background: #f8fafc;
-		border-bottom: 1px solid #e2e8f0;
-	}
+    /* Bubble Menu */
+    :global(.bubble-menu) {
+        display: flex;
+        background-color: white;
+        padding: 0.2rem;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+    }
 
-	.toolbar-group {
-		display: flex;
-		gap: 0.25rem;
-	}
+    :global(.bubble-menu button) {
+        border: none;
+        background: none;
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 500;
+        padding: 0.3rem 0.6rem;
+        cursor: pointer;
+        border-radius: 4px;
+    }
 
-	.toolbar-divider {
-		width: 1px;
-		background: #cbd5e1;
-		margin: 0 0.25rem;
-	}
+    :global(.bubble-menu button:hover) {
+        background-color: #f1f5f9;
+        color: #0f172a;
+    }
 
-	.toolbar-button {
-		padding: 0.5rem 0.75rem;
-		font-size: 0.875rem;
-		border: 1px solid transparent;
-		border-radius: 0.375rem;
-		background: transparent;
-		color: #64748b;
-		cursor: pointer;
-		transition: all 0.2s;
-		font-weight: 500;
-	}
+    :global(.bubble-menu button.active) {
+        color: #2563eb;
+        background-color: #eff6ff;
+    }
 
-	.toolbar-button:hover {
-		background: white;
-		color: #1e293b;
-		border-color: #cbd5e1;
-	}
+    /* Floating Menu (Fixed to the side of current line) */
+    :global(.floating-menu) {
+        display: flex;
+        background-color: transparent;
+        padding: 0.2rem;
+        border-radius: 6px;
+        margin-left: -2.5rem; /* Adjust based on preference */
+    }
 
-	.toolbar-button.active {
-		background: #10b981;
-		color: white;
-		border-color: #10b981;
-	}
+    :global(.floating-menu button) {
+        border: none;
+        background: white;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.2rem 0.4rem;
+        cursor: pointer;
+        border-radius: 4px;
+        margin-right: 0.5rem;
+    }
+    
+    :global(.floating-menu button:hover) {
+        background-color: #f8fafc;
+        color: #0f172a;
+    }
 
-	.editor-wrapper {
-		flex: 1;
-		position: relative;
-	}
+    /* Slash Menu */
+    .slash-menu-portal {
+        position: fixed;
+        z-index: 9999;
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(15, 15, 15, 0.1), 0 0 0 1px rgba(15, 15, 15, 0.05);
+        width: 300px;
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 0.25rem 0;
+    }
+    
+    .slash-menu-header {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
 
-	.tiptap-editor {
-		min-height: 400px;
-		padding: 1rem;
-		outline: none;
-	}
+    .slash-menu-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 0.4rem 0.75rem;
+        text-align: left;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        gap: 0.75rem;
+    }
 
-	:global(.tiptap-editor h1) {
-		font-size: 2rem;
-		font-weight: bold;
-		margin: 1rem 0 0.5rem 0;
-	}
+    .slash-menu-item:hover, .slash-menu-item.selected {
+        background-color: #f3f4f6;
+    }
 
-	:global(.tiptap-editor h2) {
-		font-size: 1.5rem;
-		font-weight: bold;
-		margin: 0.75rem 0 0.5rem 0;
-	}
+    .cmd-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        background: white;
+        font-size: 1.2rem;
+    }
 
-	:global(.tiptap-editor h3) {
-		font-size: 1.25rem;
-		font-weight: 600;
-		margin: 0.5rem 0 0.25rem 0;
-	}
+    .cmd-info {
+        flex: 1;
+        overflow: hidden;
+    }
 
-	:global(.tiptap-editor blockquote) {
-		border-left: 4px solid #cbd5e1;
-		padding-left: 1rem;
-		margin: 0.5rem 0;
-		color: #64748b;
-		font-style: italic;
-	}
+    .cmd-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #111827;
+    }
 
-	:global(.tiptap-editor pre) {
-		background: #1e293b;
-		color: #f1f5f9;
-		padding: 1rem;
-		border-radius: 0.5rem;
-		overflow-x: auto;
-		margin: 0.5rem 0;
-		font-family: monospace;
-		font-size: 0.875rem;
-	}
+    .cmd-desc {
+        font-size: 0.75rem;
+        color: #6b7280;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
-	:global(.tiptap-editor code) {
-		background: #f1f5f9;
-		color: #0f172a;
-		padding: 0.125rem 0.375rem;
-		border-radius: 0.25rem;
-		font-family: monospace;
-		font-size: 0.875em;
-	}
+    /* Tiptap content overrides for Notion feel */
+    :global(.ProseMirror) {
+        outline: none;
+    }
+    
+    :global(.ProseMirror p.is-editor-empty:first-child::before) {
+        color: #adb5bd;
+        content: attr(data-placeholder);
+        float: left;
+        height: 0;
+        pointer-events: none;
+    }
 
-	:global(.tiptap-editor pre code) {
-		background: transparent;
-		color: inherit;
-		padding: 0;
-		border-radius: 0;
-	}
+    :global(ul[data-type="taskList"]) {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
 
-	:global(.tiptap-editor ul) {
-		list-style: disc;
-		margin-left: 2rem;
-		margin: 0.5rem 0;
-	}
+    :global(li[data-type="taskItem"]) {
+        display: flex;
+        gap: 0.5rem;
+        align-items: flex-start;
+        margin: 0.25rem 0;
+    }
 
-	:global(.tiptap-editor ol) {
-		list-style: decimal;
-		margin-left: 2rem;
-		margin: 0.5rem 0;
-	}
+    :global(li[data-type="taskItem"] input[type="checkbox"]) {
+        margin-top: 0.3rem;
+        cursor: pointer;
+    }
 
-	:global(.tiptap-editor li) {
-		margin: 0.25rem 0;
-	}
+    :global(li[data-type="taskItem"] > div) {
+        flex: 1;
+    }
 
-	:global(.tiptap-editor a) {
-		color: #10b981;
-		text-decoration: underline;
-		cursor: pointer;
-	}
-
-	:global(.tiptap-editor a:hover) {
-		color: #059669;
-	}
-
-	:global(.tiptap-editor hr) {
-		margin: 1rem 0;
-		border: none;
-		border-top: 2px solid #e2e8f0;
-	}
-
-	:global(.bubble-menu) {
-		display: flex;
-		background: white;
-		border: 1px solid #e2e8f0;
-		border-radius: 0.5rem;
-		box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-		overflow: hidden;
-	}
-
-	.bubble-menu-content {
-		display: flex;
-		gap: 0;
-	}
-
-	.bubble-button {
-		padding: 0.5rem 0.75rem;
-		font-size: 0.875rem;
-		border: none;
-		background: transparent;
-		color: #64748b;
-		cursor: pointer;
-		transition: all 0.2s;
-		font-weight: 500;
-	}
-
-	.bubble-button:hover {
-		background: #f8fafc;
-		color: #1e293b;
-	}
-
-	.bubble-button.active {
-		background: #10b981;
-		color: white;
-	}
-
-	.slash-menu {
-		position: fixed;
-		background: white;
-		border: 1px solid #e2e8f0;
-		border-radius: 0.5rem;
-		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-		z-index: 50;
-		max-width: 350px;
-		max-height: 400px;
-		overflow-y: auto;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-	}
-
-	.slash-menu-header {
-		padding: 0.75rem;
-		border-bottom: 1px solid #e2e8f0;
-	}
-
-	.slash-search {
-		width: 100%;
-		padding: 0.5rem;
-		border: 1px solid #cbd5e1;
-		border-radius: 0.375rem;
-		font-size: 0.875rem;
-		outline: none;
-	}
-
-	.slash-search:focus {
-		border-color: #10b981;
-		box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
-	}
-
-	.slash-menu-items {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.slash-menu-item {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		padding: 0.75rem;
-		border: none;
-		background: transparent;
-		color: #1e293b;
-		cursor: pointer;
-		text-align: left;
-		transition: all 0.15s;
-		font-size: 0.875rem;
-	}
-
-	.slash-menu-item:hover {
-		background: #f8fafc;
-		color: #10b981;
-	}
-
-	.slash-icon {
-		font-weight: 600;
-		color: #10b981;
-		width: 1.5rem;
-	}
-
-	.slash-label {
-		flex: 1;
-	}
-
-	.editor-loading {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-height: 400px;
-		color: #94a3b8;
-		font-size: 0.875rem;
-	}
+    :global(.ProseMirror img) {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        border-radius: 4px;
+        margin: 1rem 0;
+    }
+    
+    :global(.ProseMirror h1) { font-size: 2.25em; font-weight: 700; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.1; }
+    :global(.ProseMirror h2) { font-size: 1.75em; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.1; }
+    :global(.ProseMirror h3) { font-size: 1.5em; font-weight: 600; margin-top: 1em; margin-bottom: 0.5em; line-height: 1.1; }
 </style>
