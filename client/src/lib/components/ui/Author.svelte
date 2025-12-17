@@ -1,16 +1,14 @@
 <script lang="ts">
 import avatar from '$lib/assets/avatar.png'
 
-const name = '你说话漏风（@immk）'
-const description = '想转生成为东京帅哥'
+const name = 'immki'
 </script>
 
 <div>
-  <div class="flex items-center gap-4 text-white text-shadow-xs">
-    <img class="w-16 rounded-full jelly" src={avatar} alt={name}>
+  <div class="flex justify-center flex-col items-center">
+    <img class="w-26 mb-2 rounded-full jelly" src={avatar} alt={name}>
     <div>
-      <div>{name}</div>
-      <div class="text-sm mt-0.5">{description}</div>
+      <div class="text-xl">{name}</div>
     </div>
   </div>
 </div>

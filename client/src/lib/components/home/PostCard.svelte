@@ -17,13 +17,13 @@
 
 </script>
 
-<article class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow">
+<article class="post-card bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
 	{#if post.cover}
 		<a href="/posts/{post.id}" class="block">
 			<img
 				src={post.cover}
 				alt={post.title}
-				class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300"
+				class="w-full h-48 object-cover"
 			/>
 		</a>
 	{/if}
@@ -42,7 +42,7 @@
 
 		<!-- 标题 -->
 		<h2 class="text-lg font-semibold text-slate-900 mb-2 line-clamp-2">
-			<a href="/posts/{post.id}" class="hover:text-emerald-600 transition-colors">
+			<a href="/posts/{post.id}">
 				{post.title}
 			</a>
 		</h2>
