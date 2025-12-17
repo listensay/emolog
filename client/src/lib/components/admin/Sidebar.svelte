@@ -12,6 +12,7 @@ const menuItems: MenuItem[] = [
 	{ label: '文章管理', href: '/admin/posts', icon: '📝' },
 	{ label: '分类管理', href: '/admin/categories', icon: '🏷️' },
 	{ label: '标签管理', href: '/admin/tags', icon: '🔖' },
+	{ label: '图片管理', href: '/admin/images', icon: '🖼️' },
 	{ label: '评论管理', href: '/admin/comments', icon: '💬' },
 	{ label: '用户管理', href: '/admin/users', icon: '👥' },
 	{ label: '设置', href: '/admin/settings', icon: '⚙️' }

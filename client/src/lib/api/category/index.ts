@@ -2,6 +2,14 @@ import { request } from '$lib/utils/request';
 import type { ApiResponse, PaginationResponse } from '$lib/types';
 
 /**
+ * 分类类型枚举
+ */
+export enum CategoryType {
+	POST = 'post',
+	IMAGE = 'image'
+}
+
+/**
  * 分类类型
  */
 export interface Category {
@@ -10,6 +18,7 @@ export interface Category {
 	description: string | null;
 	icon: string | null;
 	order: number;
+	type: CategoryType;
 	createdAt: string;
 	updatedAt: string;
 	isDeleted: boolean;
@@ -24,6 +33,7 @@ export interface CreateCategoryParams {
 	description?: string;
 	icon?: string;
 	order?: number;
+	type?: CategoryType;
 }
 
 /**
@@ -46,18 +56,21 @@ export const createCategory = (data: CreateCategoryParams): Promise<ApiResponse<
  */
 export const getCategoryList = (
 	page = 1,
-	pageSize = 10
+	pageSize = 10,
+	type?: CategoryType
 ): Promise<PaginationResponse<Category>> => {
 	return request.get<PaginationResponse<Category>>('/category', {
-		params: { page, pageSize }
+		params: { page, pageSize, type }
 	});
 };
 
 /**
  * 获取所有分类（不分页，用于下拉选择）
  */
-export const getAllCategories = (): Promise<ApiResponse<Category[]>> => {
-	return request.get<ApiResponse<Category[]>>('/category/list');
+export const getAllCategories = (type?: CategoryType): Promise<ApiResponse<Category[]>> => {
+	return request.get<ApiResponse<Category[]>>('/category/list', {
+		params: type ? { type } : undefined
+	});
 };
 
 /**

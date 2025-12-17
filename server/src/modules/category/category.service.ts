@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Category } from './entities/category.entity';
+import { Category, CategoryType } from './entities/category.entity';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
@@ -24,9 +24,10 @@ export class CategoryService {
       throw new BadRequestException('分类名称不能为空');
     }
 
-    // 检查分类名是否已存在
+    // 检查同类型下分类名是否已存在
+    const type = createCategoryDto.type || CategoryType.POST;
     const existing = await this.categoryRepository.findOne({
-      where: { name: createCategoryDto.name, isDeleted: false },
+      where: { name: createCategoryDto.name, type, isDeleted: false },
     });
     if (existing) {
       throw new BadRequestException('分类名称已存在');
@@ -39,9 +40,14 @@ export class CategoryService {
   /**
    * 获取所有分类（分页）
    */
-  async findAll(page = 1, pageSize = 10, isDeleted = false) {
+  async findAll(page = 1, pageSize = 10, isDeleted = false, type?: CategoryType) {
+    const where: any = { isDeleted };
+    if (type) {
+      where.type = type;
+    }
+
     const [list, total] = await this.categoryRepository.findAndCount({
-      where: { isDeleted },
+      where,
       skip: (page - 1) * pageSize,
       take: pageSize,
       order: { order: 'ASC', createdAt: 'DESC' },
@@ -52,9 +58,14 @@ export class CategoryService {
   /**
    * 获取所有分类（不分页，用于下拉选择）
    */
-  async findAllList() {
+  async findAllList(type?: CategoryType) {
+    const where: any = { isDeleted: false };
+    if (type) {
+      where.type = type;
+    }
+
     return await this.categoryRepository.find({
-      where: { isDeleted: false },
+      where,
       order: { order: 'ASC', createdAt: 'DESC' },
     });
   }
@@ -81,10 +92,11 @@ export class CategoryService {
   ): Promise<Category> {
     const category = await this.findOne(id);
 
-    // 如果更新了名称，检查是否重复
+    // 如果更新了名称，检查同类型下是否重复
     if (updateCategoryDto.name && updateCategoryDto.name !== category.name) {
+      const type = updateCategoryDto.type || category.type;
       const existing = await this.categoryRepository.findOne({
-        where: { name: updateCategoryDto.name, isDeleted: false },
+        where: { name: updateCategoryDto.name, type, isDeleted: false },
       });
       if (existing) {
         throw new BadRequestException('分类名称已存在');

@@ -2,7 +2,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import { goto } from '$app/navigation';
 	import { toast } from '$lib/stores/toast';
-	import { getCategoryList, deleteCategory } from '$lib/api/category';
+	import { getCategoryList, deleteCategory, CategoryType } from '$lib/api/category';
 	import type { Category } from '$lib/api/category';
 	import { onMount } from 'svelte';
 
@@ -14,6 +14,7 @@
 
 	let searchQuery = $state('');
 	let selectedCategories = $state<number[]>([]);
+	let selectedType = $state<CategoryType | ''>('');
 
 	const filteredCategories = $derived(
 		categories.filter((category) => {
@@ -32,7 +33,11 @@
 	async function loadCategories() {
 		isLoading = true;
 		try {
-			const response = await getCategoryList(currentPage, pageSize);
+			const response = await getCategoryList(
+				currentPage,
+				pageSize,
+				selectedType || undefined
+			);
 			categories = response.data.list;
 			total = response.data.total;
 		} catch (error) {
@@ -41,6 +46,12 @@
 		} finally {
 			isLoading = false;
 		}
+	}
+
+	function handleTypeChange() {
+		currentPage = 1;
+		selectedCategories = [];
+		loadCategories();
 	}
 
 	function handleSelectAll(e: Event) {
@@ -144,6 +155,19 @@
 				</div>
 			</div>
 
+			<!-- 类型筛选 -->
+			<div class="w-40">
+				<select
+					bind:value={selectedType}
+					onchange={handleTypeChange}
+					class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+				>
+					<option value="">全部类型</option>
+					<option value={CategoryType.POST}>文章分类</option>
+					<option value={CategoryType.IMAGE}>图片分类</option>
+				</select>
+			</div>
+
 			<!-- 批量操作 -->
 			{#if selectedCategories.length > 0}
 				<Button variant="outline" onclick={handleBatchDelete} class="text-red-600 border-red-300">
@@ -201,6 +225,11 @@
 							<th
 								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
 							>
+								类型
+							</th>
+							<th
+								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
+							>
 								描述
 							</th>
 							<th
@@ -238,6 +267,11 @@
 										{/if}
 										<span class="text-sm font-medium text-slate-900">{category.name}</span>
 									</div>
+								</td>
+								<td class="px-6 py-4">
+									<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {category.type === CategoryType.POST ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
+										{category.type === CategoryType.POST ? '文章' : '图片'}
+									</span>
 								</td>
 								<td class="px-6 py-4">
 									<div class="text-sm text-slate-600 max-w-xs truncate">

@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber, IsEnum } from 'class-validator';
+import { CategoryType } from '../entities/category.entity';
 
 export class CreateCategoryDto {
   @IsString()
@@ -16,4 +17,8 @@ export class CreateCategoryDto {
   @IsNumber()
   @IsOptional()
   order?: number;
+
+  @IsEnum(CategoryType, { message: '分类类型必须是 post 或 image' })
+  @IsOptional()
+  type?: CategoryType;
 }

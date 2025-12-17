@@ -6,6 +6,14 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+/**
+ * 分类类型枚举
+ */
+export enum CategoryType {
+  POST = 'post',
+  IMAGE = 'image',
+}
+
 @Entity('categories')
 export class Category {
   @PrimaryGeneratedColumn()
@@ -22,6 +30,13 @@ export class Category {
 
   @Column({ default: 0 })
   order: number;
+
+  @Column({
+    type: 'enum',
+    enum: CategoryType,
+    default: CategoryType.POST,
+  })
+  type: CategoryType;
 
   @CreateDateColumn()
   createdAt: Date;

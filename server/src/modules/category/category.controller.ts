@@ -16,6 +16,7 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Public } from '../../common/decorators/public.decorator';
+import { CategoryType } from './entities/category.entity';
 
 @ApiTags('分类管理')
 @Controller('category')
@@ -51,8 +52,9 @@ export class CategoryController {
   @Public()
   @Get('list')
   @ApiOperation({ summary: '获取所有分类（不分页）' })
-  async findAllList() {
-    return await this.categoryService.findAllList();
+  @ApiQuery({ name: 'type', required: false, enum: CategoryType, description: '分类类型' })
+  async findAllList(@Query('type') type?: CategoryType) {
+    return await this.categoryService.findAllList(type);
   }
 
   /**
@@ -68,11 +70,13 @@ export class CategoryController {
     description: '每页数量',
     example: 10,
   })
+  @ApiQuery({ name: 'type', required: false, enum: CategoryType, description: '分类类型' })
   async findAll(
     @Query('page') page?: number,
     @Query('pageSize') pageSize?: number,
+    @Query('type') type?: CategoryType,
   ) {
-    return await this.categoryService.findAll(page, pageSize);
+    return await this.categoryService.findAll(page, pageSize, false, type);
   }
 
   /**

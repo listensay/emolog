@@ -2,11 +2,12 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import TiptapEditor from '$lib/components/TiptapEditor.svelte';
+	import ImagePicker from '$lib/components/ImagePicker.svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { toast } from '$lib/stores/toast';
 	import { getPost, updatePost } from '$lib/api/post';
-	import { getAllCategories, type Category } from '$lib/api/category';
+	import { getAllCategories, CategoryType, type Category } from '$lib/api/category';
 	import { getAllTags, createTag, type Tag } from '$lib/api/tag';
 	import type { Post } from '$lib/api/post';
 	import { onMount } from 'svelte';
@@ -24,6 +25,7 @@
 	let selectedTagIds = $state<number[]>([]);
 	let newTagName = $state('');
 	let isCreatingTag = $state(false);
+	let showImagePicker = $state(false);
 
 	onMount(async () => {
 		const id = $page.params.id;
@@ -34,7 +36,7 @@
 			// 并行加载文章、分类和标签
 			const [postResponse, categoryResponse, tagResponse] = await Promise.all([
 				getPost(parseInt(id)),
-				getAllCategories(),
+				getAllCategories(CategoryType.POST),
 				getAllTags()
 			]);
 
@@ -83,6 +85,14 @@
 		} finally {
 			isCreatingTag = false;
 		}
+	}
+
+	function handleCoverSelect(url: string) {
+		coverImage = url;
+	}
+
+	function removeCover() {
+		coverImage = '';
 	}
 
 	async function handleSubmit() {
@@ -308,20 +318,28 @@
 				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
 					<h3 class="text-lg font-semibold text-slate-900">封面图片</h3>
 
-					<Input
-						id="coverImage"
-						label="图片URL"
-						bind:value={coverImage}
-						placeholder="https://example.com/image.jpg"
-					/>
-
 					{#if coverImage}
-						<div class="rounded-lg overflow-hidden border border-slate-200">
+						<div class="relative rounded-lg overflow-hidden border border-slate-200">
 							<img src={coverImage} alt="封面预览" class="w-full h-40 object-cover" />
+							<button
+								type="button"
+								onclick={removeCover}
+								class="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded-full text-white transition-colors"
+								title="移除封面"
+							>
+								<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+								</svg>
+							</button>
 						</div>
+						<Button variant="outline" onclick={() => (showImagePicker = true)} class="w-full">
+							更换封面
+						</Button>
 					{:else}
-						<div
-							class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center text-slate-400"
+						<button
+							type="button"
+							onclick={() => (showImagePicker = true)}
+							class="w-full border-2 border-dashed border-slate-300 rounded-lg p-8 text-center text-slate-400 hover:border-emerald-500 hover:text-emerald-500 transition-colors cursor-pointer"
 						>
 							<svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -331,8 +349,8 @@
 									d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
 								></path>
 							</svg>
-							<p class="text-sm">暂无封面图片</p>
-						</div>
+							<p class="text-sm">点击选择封面图片</p>
+						</button>
 					{/if}
 				</div>
 
@@ -362,3 +380,6 @@
 		</div>
 	</div>
 {/if}
+
+<!-- 封面图片选择器 -->
+<ImagePicker bind:open={showImagePicker} onSelect={handleCoverSelect} />

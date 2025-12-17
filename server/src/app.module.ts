@@ -1,15 +1,19 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PostModule } from './modules/post/post.module';
 import { CategoryModule } from './modules/category/category.module';
 import { TagModule } from './modules/tag/tag.module';
+import { ImageModule } from './modules/image/image.module';
 import { User } from './modules/user/entities/user.entity';
 import { Post } from './modules/post/entities/post.entity';
 import { Category } from './modules/category/entities/category.entity';
 import { Tag } from './modules/tag/entities/tag.entity';
+import { Image } from './modules/image/entities/image.entity';
 
 @Module({
   imports: [
@@ -17,6 +21,11 @@ import { Tag } from './modules/tag/entities/tag.entity';
       // 根据 NODE_ENV 加载对应的环境变量文件
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
       isGlobal: true, // 使配置在整个应用中可用
+    }),
+    // 静态文件服务，用于图片访问
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -27,7 +36,7 @@ import { Tag } from './modules/tag/entities/tag.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User, Post, Category, Tag],
+        entities: [User, Post, Category, Tag, Image],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -37,6 +46,7 @@ import { Tag } from './modules/tag/entities/tag.entity';
     PostModule,
     CategoryModule,
     TagModule,
+    ImageModule,
   ],
 })
 export class AppModule {}

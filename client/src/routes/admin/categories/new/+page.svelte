@@ -3,12 +3,13 @@
 	import Input from '$lib/components/ui/Input.svelte';
 	import { goto } from '$app/navigation';
 	import { toast } from '$lib/stores/toast';
-	import { createCategory } from '$lib/api/category';
+	import { createCategory, CategoryType } from '$lib/api/category';
 
 	let name = $state('');
 	let description = $state('');
 	let icon = $state('');
 	let order = $state(0);
+	let type = $state<CategoryType>(CategoryType.POST);
 	let isLoading = $state(false);
 
 	async function handleSubmit() {
@@ -24,7 +25,8 @@
 				name: name.trim(),
 				description: description.trim() || undefined,
 				icon: icon.trim() || undefined,
-				order: order
+				order: order,
+				type: type
 			});
 
 			toast.success('分类创建成功!');
@@ -77,6 +79,21 @@
 			placeholder="请输入分类名称..."
 			required
 		/>
+
+		<div>
+			<label for="type" class="block text-sm font-medium text-slate-700 mb-2">
+				分类类型
+			</label>
+			<select
+				id="type"
+				bind:value={type}
+				class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+			>
+				<option value={CategoryType.POST}>文章分类</option>
+				<option value={CategoryType.IMAGE}>图片分类</option>
+			</select>
+			<p class="text-xs text-slate-500 mt-1">选择分类用于文章还是图片</p>
+		</div>
 
 		<div>
 			<label for="description" class="block text-sm font-medium text-slate-700 mb-2">

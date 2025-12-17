@@ -13,12 +13,16 @@
 	import { TableCell } from '@tiptap/extension-table-cell';
 	import { TableHeader } from '@tiptap/extension-table-header';
 	import { TableRow } from '@tiptap/extension-table-row';
+	import ImagePicker from './ImagePicker.svelte';
 
 	let { content = $bindable(''), readonly = false, class: className = '' } = $props();
 
 	let editor = $state(null as any);
 	let editorReady = $state(false);
-	
+
+	// Image Picker State
+	let showImagePicker = $state(false);
+
 	// Slash Menu State
 	let showSlashMenu = $state(false);
 	let slashQuery = $state('');
@@ -254,7 +258,10 @@
 	}
 
 	function addImage() {
-		const url = prompt('Image URL:');
+		showImagePicker = true;
+	}
+
+	function handleImageSelect(url: string) {
 		if (url && editor) {
 			editor.chain().focus().setImage({ src: url }).run();
 		}
@@ -339,6 +346,9 @@
 		<div class="loading">Loading Editor...</div>
 	{/if}
 </div>
+
+<!-- Image Picker Modal -->
+<ImagePicker bind:open={showImagePicker} onSelect={handleImageSelect} />
 
 <style>
 	/* Container Styles */
