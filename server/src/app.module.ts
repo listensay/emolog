@@ -9,11 +9,13 @@ import { PostModule } from './modules/post/post.module';
 import { CategoryModule } from './modules/category/category.module';
 import { TagModule } from './modules/tag/tag.module';
 import { ImageModule } from './modules/image/image.module';
+import { CommentModule } from './modules/comment/comment.module';
 import { User } from './modules/user/entities/user.entity';
 import { Post } from './modules/post/entities/post.entity';
 import { Category } from './modules/category/entities/category.entity';
 import { Tag } from './modules/tag/entities/tag.entity';
 import { Image } from './modules/image/entities/image.entity';
+import { Comment } from './modules/comment/entities/comment.entity';
 
 @Module({
   imports: [
@@ -36,7 +38,7 @@ import { Image } from './modules/image/entities/image.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User, Post, Category, Tag, Image],
+        entities: [User, Post, Category, Tag, Image, Comment],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -47,6 +49,7 @@ import { Image } from './modules/image/entities/image.entity';
     CategoryModule,
     TagModule,
     ImageModule,
+    CommentModule,
   ],
 })
 export class AppModule {}
