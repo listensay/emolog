@@ -3,31 +3,24 @@
 	import PostCard from '$lib/components/home/PostCard.svelte';
 	import { getPostList } from '$lib/api/post';
 	import type { Post } from '$lib/api/post';
-	import { onMount } from 'svelte';
 
-	let posts: Post[] = $state([]);
-	let isLoading = $state(true);
-	let currentPage = $state(1);
-	let pageSize = $state(10);
-	let total = $state(0);
-	let hasMore = $derived(currentPage * pageSize < total);
-
-	onMount(async () => {
-		await loadPosts();
-	});
-
-	async function loadPosts() {
-		isLoading = true;
-		try {
-			const response = await getPostList(currentPage, pageSize);
-			posts = response.data.list;
-			total = response.data.total;
-		} catch (error) {
-			console.error('加载文章失败:', error);
-		} finally {
-			isLoading = false;
-		}
+	interface Props {
+		data: {
+			posts: Post[];
+			total: number;
+			page: number;
+			pageSize: number;
+		};
 	}
+
+	let { data }: Props = $props();
+
+	let posts: Post[] = $state(data.posts);
+	let currentPage = $state(data.page);
+	let pageSize = $state(data.pageSize);
+	let total = $state(data.total);
+	let isLoading = $state(false);
+	let hasMore = $derived(currentPage * pageSize < total);
 
 	async function loadMore() {
 		if (!hasMore || isLoading) return;
@@ -48,25 +41,7 @@
 <HomeLayout>
 	<div class="mx-auto">
 		<!-- 文章列表 -->
-		{#if isLoading && posts.length === 0}
-			<!-- 加载骨架屏 -->
-			<div class="space-y-4">
-				{#each Array(3) as _}
-					<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden animate-pulse">
-						<div class="h-48 bg-slate-200"></div>
-						<div class="p-5 space-y-3">
-							<div class="h-4 bg-slate-200 rounded w-1/4"></div>
-							<div class="h-6 bg-slate-200 rounded w-3/4"></div>
-							<div class="h-4 bg-slate-200 rounded w-full"></div>
-							<div class="flex justify-between">
-								<div class="h-4 bg-slate-200 rounded w-1/3"></div>
-								<div class="h-4 bg-slate-200 rounded w-1/4"></div>
-							</div>
-						</div>
-					</div>
-				{/each}
-			</div>
-		{:else if posts.length === 0}
+		{#if posts.length === 0}
 			<!-- 空状态 -->
 			<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center">
 				<svg class="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

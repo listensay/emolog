@@ -10,11 +10,11 @@ interface SiteConfigState {
 
 const defaultConfig: SiteConfig = {
 	site_title: '',
-	site_description: '一个简洁的博客系统',
+	site_description: '',
 	site_icon: '',
 	site_logo: '',
-	site_keywords: '博客,技术,分享',
-	site_footer: '© 2025 Emolog. All rights reserved.'
+	site_keywords: '',
+	site_footer: ''
 };
 
 function createSiteConfigStore() {
@@ -44,7 +44,7 @@ function createSiteConfigStore() {
 		},
 		updateConfig: (newConfig: Partial<SiteConfig>) => {
 			update(state => ({
-				...state,
+				isLoaded: true,
 				config: { ...state.config, ...newConfig }
 			}));
 		}
