@@ -32,7 +32,7 @@
 
 	<!-- 页脚 -->
 	{#if configState.config.site_footer}
-		<footer class="w-full py-6 border-t border-slate-200 bg-white">
+		<footer class="w-full py-6">
 			<div class="w-[1200px] mx-auto text-center text-sm text-slate-500">
 				{@html configState.config.site_footer}
 			</div>

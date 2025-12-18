@@ -100,10 +100,18 @@
 			<div class="flex flex-wrap items-center gap-4 text-sm text-slate-500">
 				{#if post.author}
 					<span class="flex items-center gap-2">
-						<div class="w-8 h-8 rounded-full bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm font-medium">
-							{post.author.username?.charAt(0).toUpperCase() || 'U'}
-						</div>
-						{post.author.username}
+						{#if post.author.avatar}
+							<img
+								src={post.author.avatar}
+								alt={post.author.nickname || post.author.username}
+								class="w-8 h-8 rounded-full object-cover"
+							/>
+						{:else}
+							<div class="w-8 h-8 rounded-full bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm font-medium">
+								{(post.author.nickname || post.author.username)?.charAt(0).toUpperCase() || 'U'}
+							</div>
+						{/if}
+						{post.author.nickname || post.author.username}
 					</span>
 				{/if}
 				<span class="flex items-center gap-1">
@@ -127,17 +135,6 @@
 				</span>
 			</div>
 		</header>
-
-		<!-- 封面图 -->
-		{#if post.cover}
-			<div class="relative rounded-xl overflow-hidden mb-8">
-				<img
-					src={post.cover}
-					alt={post.title}
-					class="w-full h-80 object-cover"
-				/>
-			</div>
-		{/if}
 
 		<!-- 文章正文 -->
 		<div class="bg-white rounded-xl border border-slate-200 p-8 overflow-hidden">

@@ -58,6 +58,7 @@ npm run lint             # ESLint + Prettier
 - `tag/` - 标签管理
 - `image/` - 图片上传管理
 - `comment/` - 评论管理
+- `config/` - 站点配置（key-value 存储）
 
 **数据模型关系**:
 ```
@@ -93,8 +94,8 @@ PORT=8080
 
 **路由结构** (`src/routes/`):
 ```
-/                      # 首页（文章列表）
-/posts/[id]            # 文章详情
+/                      # 首页（文章列表，SSR）
+/posts/[id]            # 文章详情（SSR）
 /auth/login            # 登录
 /admin/                # 管理后台（需认证）
   /posts/              # 文章管理
@@ -102,11 +103,18 @@ PORT=8080
   /tags/               # 标签管理
   /images/             # 图片管理
   /comments/           # 评论管理
+  /settings/           # 站点设置
 ```
+
+**SSR 数据流**:
+- `+layout.server.ts` - 加载 siteConfig
+- `+page.server.ts` - 调用 `parent()` 获取 siteConfig，加载页面数据
+- `+page.svelte` - 使用 `data.siteConfig` 和 `data.*` 渲染
 
 **状态管理** (`src/lib/stores/`):
 - `auth.ts` - 认证状态（localStorage 同步）
 - `toast.ts` - 全局消息提示
+- `siteConfig.ts` - 站点配置（客户端缓存）
 
 **API 层** (`src/lib/api/`):
 - Axios 实例 + 请求/响应拦截器
