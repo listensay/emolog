@@ -77,7 +77,7 @@
 	{/if}
 </svelte:head>
 
-<HomeLayout>
+<HomeLayout showBackButton={true}>
 	<!-- 文章详情 -->
 	<article class="w-full">
 		<!-- 标题区 -->
@@ -94,10 +94,10 @@
 			{/if}
 
 			<!-- 标题 -->
-			<h1 class="text-3xl font-bold text-slate-900 mb-4">{post.title}</h1>
+			<h1 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4">{post.title}</h1>
 
 			<!-- 元信息 -->
-			<div class="flex flex-wrap items-center gap-4 text-sm text-slate-500">
+			<div class="flex flex-wrap items-center gap-3 md:gap-4 text-sm text-slate-500">
 				{#if post.author}
 					<span class="flex items-center gap-2">
 						{#if post.author.avatar}
@@ -137,7 +137,7 @@
 		</header>
 
 		<!-- 文章正文 -->
-		<div class="bg-white rounded-xl border border-slate-200 p-8 overflow-hidden">
+		<div class="bg-white rounded-xl border border-slate-200 p-4 md:p-8 overflow-hidden">
 			<div class="prose max-sm:prose-sm prose-slate prose-emerald prose-headings:text-slate-900 prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-pre:bg-slate-900 max-w-full">
 				{@html post.content}
 			</div>

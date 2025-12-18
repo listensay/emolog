@@ -2,22 +2,53 @@
 	import Author from '$lib/components/ui/Author.svelte';
 	import Menu from '$lib/components/ui/Menu.svelte';
 	import { siteConfig } from '$lib/stores/siteConfig';
+	import avatar from '$lib/assets/avatar.png';
 
 	import type { Snippet } from 'svelte';
 
 	interface Props {
 		children: Snippet;
+		showBackButton?: boolean;
 	}
 
-	let { children }: Props = $props();
+	let { children, showBackButton = false }: Props = $props();
 
 	const configState = $derived($siteConfig);
+
+	function goBack() {
+		history.back();
+	}
 </script>
 
 <div class="flex flex-col min-h-screen">
-	<div class="flex flex-1 w-[1200px] mx-auto">
-		<!-- 侧边栏 -->
-		<aside class="sticky top-0 h-screen w-64 shrink-0">
+	<!-- 移动端顶部栏 -->
+	<header class="lg:hidden sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200">
+		<div class="flex items-center justify-between px-4 py-3">
+			{#if showBackButton}
+				<button onclick={goBack} class="flex items-center gap-1 text-slate-600">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+					</svg>
+					<span>返回</span>
+				</button>
+			{:else}
+				<div class="w-16"></div>
+			{/if}
+			<a href="/" class="flex items-center gap-2">
+				{#if configState.config.site_logo}
+					<img class="w-8 h-8 rounded-full" src={configState.config.site_logo} alt={configState.config.site_title}>
+				{:else}
+					<img class="w-8 h-8 rounded-full" src={avatar} alt={configState.config.site_title}>
+				{/if}
+				<span class="font-medium text-slate-900">{configState.config.site_title}</span>
+			</a>
+			<div class="w-16"></div>
+		</div>
+	</header>
+
+	<div class="flex flex-1 w-full max-w-[1200px] mx-auto px-4 lg:px-0">
+		<!-- 侧边栏 - 移动端隐藏 -->
+		<aside class="hidden lg:block sticky top-0 h-screen w-64 shrink-0">
 			<div class="pt-20 mb-5">
 				<Author />
 			</div>
@@ -25,15 +56,15 @@
 		</aside>
 
 		<!-- 主内容区 -->
-		<main class="flex-1 p-6 overflow-auto">
+		<main class="flex-1 py-6 lg:p-6 overflow-auto">
 			{@render children()}
 		</main>
 	</div>
 
 	<!-- 页脚 -->
 	{#if configState.config.site_footer}
-		<footer class="w-full py-6">
-			<div class="w-[1200px] mx-auto text-center text-sm text-slate-500">
+		<footer class="w-full py-6 px-4">
+			<div class="max-w-[1200px] mx-auto text-center text-sm text-slate-500">
 				{@html configState.config.site_footer}
 			</div>
 		</footer>
