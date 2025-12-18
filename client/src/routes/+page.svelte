@@ -3,6 +3,7 @@
 	import PostCard from '$lib/components/home/PostCard.svelte';
 	import { getPostList } from '$lib/api/post';
 	import type { Post } from '$lib/api/post';
+	import type { SiteConfig } from '$lib/api/config';
 
 	interface Props {
 		data: {
@@ -10,6 +11,7 @@
 			total: number;
 			page: number;
 			pageSize: number;
+			siteConfig: SiteConfig;
 		};
 	}
 
@@ -37,6 +39,10 @@
 		}
 	}
 </script>
+
+<svelte:head>
+	<title>{data.siteConfig.site_title}</title>
+</svelte:head>
 
 <HomeLayout>
 	<div class="mx-auto">

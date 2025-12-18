@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
 	import { incrementPostViews, incrementPostLikes } from '$lib/api/post';
 	import type { Post } from '$lib/api/post';
+	import type { SiteConfig } from '$lib/api/config';
 	import HomeLayout from '$lib/components/layout/HomeLayout.svelte';
-	import { siteConfig } from '$lib/stores/siteConfig';
 
 	interface Props {
 		data: {
 			post: Post;
+			siteConfig: SiteConfig;
 		};
 	}
 
@@ -17,8 +17,6 @@
 	let post: Post = $state(data.post);
 	let isLiking = $state(false);
 	let hasLiked = $state(false);
-
-	const configState = $derived($siteConfig);
 
 	// 客户端初始化
 	$effect(() => {
@@ -65,7 +63,7 @@
 </script>
 
 <svelte:head>
-	<title>{post.title} - {configState.config.site_title}</title>
+	<title>{post.title} - {data.siteConfig.site_title}</title>
 	<meta name="description" content={post.description || post.title} />
 	{#if post.tags && post.tags.length > 0}
 		<meta name="keywords" content={post.tags.map(t => t.name).join(',')} />
