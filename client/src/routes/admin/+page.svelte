@@ -35,7 +35,7 @@ const recentPosts = [
 	<!-- 统计卡片 -->
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 		{#each stats as stat}
-			<div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
+			<div class="bg-white rounded-xl p-6  border border-slate-200 hover:shadow-md transition-shadow">
 				<div class="flex items-start justify-between">
 					<div>
 						<p class="text-sm text-slate-600 mb-1">{stat.label}</p>
@@ -51,7 +51,7 @@ const recentPosts = [
 	</div>
 
 	<!-- 最近文章 -->
-	<div class="bg-white rounded-xl shadow-sm border border-slate-200">
+	<div class="bg-white rounded-xl  border border-slate-200">
 		<div class="p-6 border-b border-slate-200">
 			<h3 class="text-lg font-bold text-slate-900">最近文章</h3>
 		</div>
@@ -99,7 +99,7 @@ const recentPosts = [
 	<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 		<a
 			href="/admin/posts"
-			class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-emerald-300 transition-all group"
+			class="bg-white rounded-xl p-6  border border-slate-200 hover:shadow-md hover:border-emerald-300 transition-all group"
 		>
 			<div class="text-3xl mb-3">📝</div>
 			<h4 class="text-lg font-bold text-slate-900 mb-2">创建文章</h4>
@@ -111,7 +111,7 @@ const recentPosts = [
 
 		<a
 			href="/admin/categories"
-			class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-teal-300 transition-all group"
+			class="bg-white rounded-xl p-6  border border-slate-200 hover:shadow-md hover:border-teal-300 transition-all group"
 		>
 			<div class="text-3xl mb-3">🏷️</div>
 			<h4 class="text-lg font-bold text-slate-900 mb-2">分类管理</h4>
@@ -123,7 +123,7 @@ const recentPosts = [
 
 		<a
 			href="/admin/settings"
-			class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 hover:shadow-md hover:border-emerald-300 transition-all group"
+			class="bg-white rounded-xl p-6  border border-slate-200 hover:shadow-md hover:border-emerald-300 transition-all group"
 		>
 			<div class="text-3xl mb-3">⚙️</div>
 			<h4 class="text-lg font-bold text-slate-900 mb-2">系统设置</h4>

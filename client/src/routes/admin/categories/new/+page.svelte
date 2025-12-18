@@ -71,7 +71,7 @@
 	</div>
 
 	<!-- 编辑表单 -->
-	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+	<div class="bg-white rounded-xl  border border-slate-200 p-6 space-y-6">
 		<Input
 			id="name"
 			label="分类名称"

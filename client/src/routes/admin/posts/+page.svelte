@@ -122,7 +122,7 @@
 	</div>
 
 	<!-- 搜索和筛选 -->
-	<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+	<div class="bg-white rounded-xl  border border-slate-200 p-4">
 		<div class="flex flex-col md:flex-row gap-4">
 			<!-- 搜索框 -->
 			<div class="flex-1">
@@ -159,7 +159,7 @@
 	</div>
 
 	<!-- 文章列表 -->
-	<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+	<div class="bg-white rounded-xl  border border-slate-200 overflow-hidden">
 		<div class="overflow-x-auto">
 			{#if isLoading}
 				<div class="px-6 py-12 text-center text-slate-500">

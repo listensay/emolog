@@ -92,7 +92,7 @@ export const colors = {
  */
 export const presets = {
 	// 主按钮
-	buttonPrimary: `${colors.primary.bg} text-white ${colors.primary.bgHover} shadow-sm`,
+	buttonPrimary: `${colors.primary.bg} text-white ${colors.primary.bgHover} `,
 	// 输入框焦点
 	inputFocus: `focus:outline-none focus:ring-2 ${colors.primary.focusRing} focus:border-transparent`,
 	// 复选框

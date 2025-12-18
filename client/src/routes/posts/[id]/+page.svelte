@@ -140,7 +140,7 @@
 		{/if}
 
 		<!-- 文章正文 -->
-		<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 overflow-hidden">
+		<div class="bg-white rounded-xl border border-slate-200 p-8 overflow-hidden">
 			<div class="prose max-sm:prose-sm prose-slate prose-emerald prose-headings:text-slate-900 prose-a:text-emerald-600 prose-a:no-underline hover:prose-a:underline prose-img:rounded-lg prose-pre:bg-slate-900 max-w-full">
 				{@html post.content}
 			</div>

@@ -171,7 +171,7 @@
 			<!-- 主编辑区 -->
 			<div class="lg:col-span-2 space-y-6">
 				<!-- 基本信息 -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+				<div class="bg-white rounded-xl  border border-slate-200 p-6 space-y-4">
 					<h2 class="text-lg font-semibold text-slate-900">基本信息</h2>
 
 					<Input
@@ -198,7 +198,7 @@
 				</div>
 
 				<!-- 内容编辑 -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+				<div class="bg-white rounded-xl  border border-slate-200 p-6 space-y-4">
 					<h2 class="text-lg font-semibold text-slate-900">文章内容</h2>
 					<TiptapEditor
 						bind:content
@@ -213,7 +213,7 @@
 			<!-- 侧边栏设置 -->
 			<div class="space-y-6">
 				<!-- 发布设置 -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+				<div class="bg-white rounded-xl  border border-slate-200 p-6 space-y-4">
 					<h3 class="text-lg font-semibold text-slate-900">发布设置</h3>
 
 					<div>
@@ -291,7 +291,7 @@
 				</div>
 
 				<!-- 文章信息 -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+				<div class="bg-white rounded-xl  border border-slate-200 p-6 space-y-4">
 					<h3 class="text-lg font-semibold text-slate-900">文章信息</h3>
 
 					<div class="space-y-3 text-sm">
@@ -315,7 +315,7 @@
 				</div>
 
 				<!-- 封面图片 -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+				<div class="bg-white rounded-xl  border border-slate-200 p-6 space-y-4">
 					<h3 class="text-lg font-semibold text-slate-900">封面图片</h3>
 
 					{#if coverImage}
@@ -355,7 +355,7 @@
 				</div>
 
 				<!-- 文章统计 -->
-				<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+				<div class="bg-white rounded-xl  border border-slate-200 p-6 space-y-4">
 					<h3 class="text-lg font-semibold text-slate-900">文章统计</h3>
 
 					<div class="space-y-2 text-sm">

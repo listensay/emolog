@@ -220,7 +220,7 @@
 <div class="flex h-full gap-6">
 	<!-- 左侧分类列表 -->
 	<div class="w-64 flex-shrink-0">
-		<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+		<div class="bg-white rounded-xl  border border-slate-200 overflow-hidden">
 			<div class="p-4 border-b border-slate-200 flex items-center justify-between">
 				<h3 class="font-semibold text-slate-900">图片分类</h3>
 				<button
@@ -275,7 +275,7 @@
 	<!-- 右侧图片列表 -->
 	<div class="flex-1 space-y-4">
 		<!-- 工具栏 -->
-		<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+		<div class="bg-white rounded-xl  border border-slate-200 p-4">
 			<div class="flex items-center justify-between">
 				<div class="flex items-center gap-4">
 					<h1 class="text-xl font-bold text-slate-900">
@@ -315,7 +315,7 @@
 		</div>
 
 		<!-- 图片网格 -->
-		<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+		<div class="bg-white rounded-xl  border border-slate-200 p-4">
 			{#if isLoading}
 				<div class="flex items-center justify-center py-12">
 					<p class="text-slate-500">加载中...</p>

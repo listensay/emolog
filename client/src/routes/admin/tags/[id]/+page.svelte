@@ -93,7 +93,7 @@
 		</div>
 
 		<!-- 编辑表单 -->
-		<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+		<div class="bg-white rounded-xl  border border-slate-200 p-6 space-y-6">
 			<Input
 				id="name"
 				label="标签名称"
@@ -113,7 +113,7 @@
 		</div>
 
 		<!-- 标签信息 -->
-		<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+		<div class="bg-white rounded-xl  border border-slate-200 p-6 space-y-4">
 			<h3 class="text-lg font-semibold text-slate-900">标签信息</h3>
 
 			<div class="space-y-3 text-sm">
