@@ -7,7 +7,6 @@
 	import HomeLayout from '$lib/components/layout/HomeLayout.svelte';
 
 	let post: Post | null = $state(null);
-	let relatedPosts: Post[] = $state([]);
 	let isLoading = $state(true);
 	let isLiking = $state(false);
 	let hasLiked = $state(false);
@@ -17,7 +16,6 @@
 
 	onMount(async () => {
 		await loadPost();
-		await loadRelatedPosts();
 	});
 
 	async function loadPost() {
@@ -36,16 +34,6 @@
 			console.error('加载文章失败:', err);
 		} finally {
 			isLoading = false;
-		}
-	}
-
-	async function loadRelatedPosts() {
-		try {
-			const response = await getPostList(1, 4);
-			// 过滤掉当前文章
-			relatedPosts = response.data.list.filter(p => p.id !== postId).slice(0, 3);
-		} catch (err) {
-			console.error('加载相关文章失败:', err);
 		}
 	}
 
@@ -208,56 +196,6 @@
 				{/if}
 			</div>
 
-			<!-- 相关文章 -->
-			{#if relatedPosts.length > 0}
-				<section class="mt-12">
-					<h2 class="text-xl font-bold text-slate-900 mb-6">相关文章</h2>
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-						{#each relatedPosts as relatedPost (relatedPost.id)}
-							<a
-								href="/posts/{relatedPost.id}"
-								class="block bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
-							>
-								{#if relatedPost.cover}
-									<img
-										src={relatedPost.cover}
-										alt={relatedPost.title}
-										class="w-full h-32 object-cover"
-									/>
-								{:else}
-									<div class="w-full h-32 bg-linear-to-br from-emerald-400 to-teal-500"></div>
-								{/if}
-								<div class="p-4">
-									<h3 class="font-medium text-slate-900 line-clamp-2">
-										{relatedPost.title}
-									</h3>
-									<p class="text-sm text-slate-500 mt-2">{formatDate(relatedPost.createdAt)}</p>
-								</div>
-							</a>
-						{/each}
-					</div>
-				</section>
-			{/if}
 		</article>
 	{/if}
 </HomeLayout>
-
-<style>
-/* :global(.prose pre) {
-	padding: 1rem;
-	border-radius: 0.5rem;
-	overflow-x: auto;
-	max-width: calc(100vw - 256px - 48px - 64px - 64px);
-	width: 100%;
-}
-
-@media (min-width: 1200px) {
-	:global(.prose pre) {
-		max-width: 832px;
-	}
-}
-:global(.prose pre code) {
-	background-color: transparent;
-	padding: 0;
-} */
-</style>

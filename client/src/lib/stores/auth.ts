@@ -57,6 +57,19 @@ function createAuthStore() {
 				token: null
 			});
 		},
+		updateUser: (userData: Partial<User>) => {
+			update(state => {
+				if (!state.user) return state;
+				const newUser = { ...state.user, ...userData };
+				if (browser) {
+					localStorage.setItem('user', JSON.stringify(newUser));
+				}
+				return {
+					...state,
+					user: newUser
+				};
+			});
+		},
 		checkAuth: () => {
 			if (!browser) return false;
 

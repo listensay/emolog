@@ -1,14 +1,20 @@
 <script lang="ts">
 import avatar from '$lib/assets/avatar.png'
+import { siteConfig } from '$lib/stores/siteConfig';
 
-const name = 'immki'
+const configState = $derived($siteConfig);
 </script>
 
 <div>
   <div class="flex justify-center flex-col items-center">
-    <img class="w-26 mb-2 rounded-full jelly" src={avatar} alt={name}>
+    {#if configState.config.site_logo}
+      <img class="w-26 mb-2 rounded-full jelly" src={configState.config.site_logo} alt={configState.config.site_title}>
+    {:else}
+      <img class="w-26 mb-2 rounded-full jelly" src={avatar} alt={configState.config.site_title}>
+    {/if}
     <div>
-      <div class="text-xl">{name}</div>
+      <div class="text-xl">{configState.config.site_title}</div>
+
     </div>
   </div>
 </div>

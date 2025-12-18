@@ -62,19 +62,27 @@ function handleLogout() {
 
 				<!-- 用户信息 -->
 				{#if authState.user}
-					<div class="flex items-center gap-3 pl-4 border-l border-slate-200">
+					<a href="/admin/profile" class="flex items-center gap-3 pl-4 border-l border-slate-200 hover:opacity-80 transition-opacity">
 						<div class="text-right">
 							<p class="text-sm font-medium text-slate-900">
-								{authState.user.username}
+								{authState.user.nickname || authState.user.username}
 							</p>
 							<p class="text-xs text-slate-500">
 								{authState.user.email}
 							</p>
 						</div>
-						<div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
-							{authState.user.username.charAt(0).toUpperCase()}
-						</div>
-					</div>
+						{#if authState.user.avatar}
+							<img
+								src={authState.user.avatar}
+								alt={authState.user.username}
+								class="w-10 h-10 rounded-full object-cover"
+							/>
+						{:else}
+							<div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
+								{authState.user.username.charAt(0).toUpperCase()}
+							</div>
+						{/if}
+					</a>
 				{/if}
 
 				<!-- 退出按钮 -->

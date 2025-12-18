@@ -2,12 +2,15 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -104,5 +107,47 @@ export class UserService {
   async remove(id: number): Promise<void> {
     const user = await this.findOne(id);
     await this.userRepository.remove(user);
+  }
+
+  /**
+   * 修改密码
+   */
+  async changePassword(
+    id: number,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('用户不存在');
+    }
+
+    // 验证当前密码
+    const isPasswordValid = await user.validatePassword(
+      changePasswordDto.currentPassword,
+    );
+    if (!isPasswordValid) {
+      throw new BadRequestException('当前密码不正确');
+    }
+
+    // 更新密码
+    user.password = await bcrypt.hash(changePasswordDto.newPassword, 10);
+    await this.userRepository.save(user);
+  }
+
+  /**
+   * 更新用户资料（不包含密码）
+   */
+  async updateProfile(
+    id: number,
+    updateData: { nickname?: string; avatar?: string },
+  ): Promise<User> {
+    const user = await this.findOne(id);
+    if (updateData.nickname !== undefined) {
+      user.nickname = updateData.nickname;
+    }
+    if (updateData.avatar !== undefined) {
+      user.avatar = updateData.avatar;
+    }
+    return await this.userRepository.save(user);
   }
 }

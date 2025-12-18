@@ -10,12 +10,14 @@ import { CategoryModule } from './modules/category/category.module';
 import { TagModule } from './modules/tag/tag.module';
 import { ImageModule } from './modules/image/image.module';
 import { CommentModule } from './modules/comment/comment.module';
+import { SiteConfigModule } from './modules/config/config.module';
 import { User } from './modules/user/entities/user.entity';
 import { Post } from './modules/post/entities/post.entity';
 import { Category } from './modules/category/entities/category.entity';
 import { Tag } from './modules/tag/entities/tag.entity';
 import { Image } from './modules/image/entities/image.entity';
 import { Comment } from './modules/comment/entities/comment.entity';
+import { Config } from './modules/config/entities/config.entity';
 
 @Module({
   imports: [
@@ -38,7 +40,7 @@ import { Comment } from './modules/comment/entities/comment.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User, Post, Category, Tag, Image, Comment],
+        entities: [User, Post, Category, Tag, Image, Comment, Config],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -50,6 +52,7 @@ import { Comment } from './modules/comment/entities/comment.entity';
     TagModule,
     ImageModule,
     CommentModule,
+    SiteConfigModule,
   ],
 })
 export class AppModule {}
