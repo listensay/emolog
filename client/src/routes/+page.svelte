@@ -47,11 +47,6 @@
 
 <HomeLayout>
 	<div class="mx-auto">
-		<!-- 页面标题 -->
-		<div class="mb-6">
-			<h1 class="text-2xl font-bold text-slate-900">最新文章</h1>
-		</div>
-
 		<!-- 文章列表 -->
 		{#if isLoading && posts.length === 0}
 			<!-- 加载骨架屏 -->

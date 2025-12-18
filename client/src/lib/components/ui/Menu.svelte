@@ -11,7 +11,7 @@
 		{ label: '首页', href: '/' },
 		{ label: '归档', href: '/archives' },
 		{ label: '关于', href: '/about', },
-		{ label: '朋友们', href: '/links', }
+		{ label: '朋友', href: '/links', }
 	];
 
 	const currentPath = $derived($page.url.pathname);
@@ -25,7 +25,7 @@
 </script>
 
 <div class="menu flex justify-center">
-	<nav class="bg-white w-4/5 rounded-3xl shadow-sm">
+	<nav class="bg-white w-4/5 rounded-3xl border border-slate-200">
 		<ul class="flex flex-col justify-center items-center gap-1 p-3">
 			{#each menuItems as item}
 				<li class="w-full">
