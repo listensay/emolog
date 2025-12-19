@@ -8,6 +8,10 @@ export default defineConfig(({ mode }) => {
 
 	return {
 		plugins: [tailwindcss(), sveltekit()],
+		ssr: {
+			// 将 axios 打包进 bundle，而不是作为外部依赖
+			noExternal: ['axios']
+		},
 		server: {
 			proxy: {
 				'/api': {
