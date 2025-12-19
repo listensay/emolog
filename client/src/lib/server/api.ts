@@ -1,5 +1,4 @@
 import { env } from '$env/dynamic/private';
-import { env as publicEnv } from '$env/dynamic/public';
 
 /**
  * 服务端 API 基础 URL
@@ -7,7 +6,7 @@ import { env as publicEnv } from '$env/dynamic/public';
  */
 const getServerApiUrl = () => {
 	// 优先使用私有环境变量
-	return env.SERVER_URL || publicEnv.PUBLIC_SERVER_URL || 'http://localhost:8080';
+	return env.VITE_SERVER_URL;
 };
 
 /**
