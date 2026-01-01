@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import type { ComponentType } from 'svelte';
 	import { createEditor, EditorContent, BubbleMenu, FloatingMenu } from 'svelte-tiptap';
 	import StarterKit from '@tiptap/starter-kit';
 	import Placeholder from '@tiptap/extension-placeholder';
@@ -14,6 +15,7 @@
 	import { TableHeader } from '@tiptap/extension-table-header';
 	import { TableRow } from '@tiptap/extension-table-row';
 	import ImagePicker from './ImagePicker.svelte';
+	import { FileText, ImageIcon } from '@lucide/svelte';
 
 	let { content = $bindable(''), readonly = false, class: className = '' } = $props();
 
@@ -30,83 +32,89 @@
 	let selectedIndex = $state(0);
 	let slashMenuRef = $state(null as HTMLElement | null);
 
-	const slashCommands = [
-		{ 
+	const slashCommands: Array<{
+		id: string;
+		label: string;
+		desc: string;
+		command: (editor: any) => void;
+		icon: ComponentType | string;
+	}> = [
+		{
 			id: 'text',
-			label: 'Text', 
+			label: 'Text',
 			desc: 'Start writing with plain text.',
-			command: (editor: any) => editor.chain().focus().setParagraph().run(), 
-			icon: '📝' 
+			command: (editor: any) => editor.chain().focus().setParagraph().run(),
+			icon: FileText
 		},
-		{ 
+		{
 			id: 'heading1',
-			label: 'Heading 1', 
+			label: 'Heading 1',
 			desc: 'Big section heading.',
-			command: (editor: any) => editor.chain().focus().toggleHeading({ level: 1 }).run(), 
-			icon: 'H1' 
+			command: (editor: any) => editor.chain().focus().toggleHeading({ level: 1 }).run(),
+			icon: 'H1'
 		},
-		{ 
+		{
 			id: 'heading2',
-			label: 'Heading 2', 
+			label: 'Heading 2',
 			desc: 'Medium section heading.',
-			command: (editor: any) => editor.chain().focus().toggleHeading({ level: 2 }).run(), 
-			icon: 'H2' 
+			command: (editor: any) => editor.chain().focus().toggleHeading({ level: 2 }).run(),
+			icon: 'H2'
 		},
-		{ 
+		{
 			id: 'heading3',
-			label: 'Heading 3', 
+			label: 'Heading 3',
 			desc: 'Small section heading.',
-			command: (editor: any) => editor.chain().focus().toggleHeading({ level: 3 }).run(), 
-			icon: 'H3' 
+			command: (editor: any) => editor.chain().focus().toggleHeading({ level: 3 }).run(),
+			icon: 'H3'
 		},
-		{ 
+		{
 			id: 'bulletRequest',
-			label: 'Bullet List', 
+			label: 'Bullet List',
 			desc: 'Create a simple bulleted list.',
-			command: (editor: any) => editor.chain().focus().toggleBulletList().run(), 
-			icon: '•' 
+			command: (editor: any) => editor.chain().focus().toggleBulletList().run(),
+			icon: '•'
 		},
-		{ 
+		{
 			id: 'orderedList',
-			label: 'Numbered List', 
+			label: 'Numbered List',
 			desc: 'Create a list with numbering.',
-			command: (editor: any) => editor.chain().focus().toggleOrderedList().run(), 
-			icon: '1.' 
+			command: (editor: any) => editor.chain().focus().toggleOrderedList().run(),
+			icon: '1.'
 		},
-		{ 
+		{
 			id: 'taskList',
-			label: 'To-do List', 
+			label: 'To-do List',
 			desc: 'Track tasks with a to-do list.',
-			command: (editor: any) => editor.chain().focus().toggleTaskList().run(), 
-			icon: '☐' 
+			command: (editor: any) => editor.chain().focus().toggleTaskList().run(),
+			icon: '☐'
 		},
-		{ 
+		{
 			id: 'blockquote',
-			label: 'Quote', 
+			label: 'Quote',
 			desc: 'Capture a quote.',
-			command: (editor: any) => editor.chain().focus().toggleBlockquote().run(), 
-			icon: '❝' 
+			command: (editor: any) => editor.chain().focus().toggleBlockquote().run(),
+			icon: '❝'
 		},
-		{ 
+		{
 			id: 'codeBlock',
-			label: 'Code', 
+			label: 'Code',
 			desc: 'Capture a code snippet.',
-			command: (editor: any) => editor.chain().focus().toggleCodeBlock().run(), 
-			icon: '</>' 
+			command: (editor: any) => editor.chain().focus().toggleCodeBlock().run(),
+			icon: '</>'
 		},
-		{ 
+		{
 			id: 'divider',
-			label: 'Divider', 
+			label: 'Divider',
 			desc: 'Visually divide blocks.',
-			command: (editor: any) => editor.chain().focus().setHorizontalRule().run(), 
-			icon: '—' 
+			command: (editor: any) => editor.chain().focus().setHorizontalRule().run(),
+			icon: '—'
 		},
-        { 
+        {
 			id: 'image',
-			label: 'Image', 
+			label: 'Image',
 			desc: 'Upload or embed an image.',
-			command: (editor: any) => addImage(), 
-			icon: '🖼️' 
+			command: (editor: any) => addImage(),
+			icon: ImageIcon
 		}
 	];
 
@@ -323,13 +331,20 @@
 				<div class="slash-menu-list">
 					<div class="slash-menu-header">Basic blocks</div>
 					{#each filteredCommands as cmd, i}
-						<button 
-							class="slash-menu-item" 
+						<button
+							class="slash-menu-item"
 							class:selected={i === selectedIndex}
 							onclick={() => executeCommand(cmd)}
 							onmouseenter={() => selectedIndex = i}
 						>
-							<div class="cmd-icon">{cmd.icon}</div>
+							<div class="cmd-icon">
+								{#if typeof cmd.icon === 'string'}
+									{cmd.icon}
+								{:else}
+									{@const Icon = cmd.icon}
+									<Icon class="w-5 h-5" />
+								{/if}
+							</div>
 							<div class="cmd-info">
 								<div class="cmd-label">{cmd.label}</div>
 								<div class="cmd-desc">{cmd.desc}</div>

@@ -1,21 +1,23 @@
 <script lang="ts">
 import { page } from '$app/state';
+import type { ComponentType } from 'svelte';
+import { LayoutDashboard, FileText, FolderOpen, Tag, ImageIcon, MessageCircle, Users, Settings } from '@lucide/svelte';
 
 interface MenuItem {
 	label: string;
 	href: string;
-	icon: string;
+	icon: ComponentType;
 }
 
 const menuItems: MenuItem[] = [
-	{ label: '仪表盘', href: '/admin', icon: '📊' },
-	{ label: '文章管理', href: '/admin/posts', icon: '📝' },
-	{ label: '分类管理', href: '/admin/categories', icon: '🏷️' },
-	{ label: '标签管理', href: '/admin/tags', icon: '🔖' },
-	{ label: '图片管理', href: '/admin/images', icon: '🖼️' },
-	{ label: '评论管理', href: '/admin/comments', icon: '💬' },
-	{ label: '用户管理', href: '/admin/users', icon: '👥' },
-	{ label: '设置', href: '/admin/settings', icon: '⚙️' }
+	{ label: '仪表盘', href: '/admin', icon: LayoutDashboard },
+	{ label: '文章管理', href: '/admin/posts', icon: FileText },
+	{ label: '分类管理', href: '/admin/categories', icon: FolderOpen },
+	{ label: '标签管理', href: '/admin/tags', icon: Tag },
+	{ label: '图片管理', href: '/admin/images', icon: ImageIcon },
+	{ label: '评论管理', href: '/admin/comments', icon: MessageCircle },
+	{ label: '用户管理', href: '/admin/users', icon: Users },
+	{ label: '设置', href: '/admin/settings', icon: Settings }
 ];
 
 const currentPath = $derived(page.url.pathname);
@@ -41,6 +43,7 @@ function isActive(href: string): boolean {
 	<nav class="flex-1 overflow-y-auto p-4">
 		<ul class="space-y-1">
 			{#each menuItems as item}
+				{@const Icon = item.icon}
 				<li>
 					<a
 						href={item.href}
@@ -50,7 +53,7 @@ function isActive(href: string): boolean {
 							? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/50'
 							: 'text-slate-300 hover:bg-slate-800 hover:text-white'}"
 					>
-						<span class="text-xl">{item.icon}</span>
+						<Icon class="w-5 h-5" />
 						<span class="font-medium">{item.label}</span>
 					</a>
 				</li>

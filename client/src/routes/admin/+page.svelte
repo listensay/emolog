@@ -1,14 +1,15 @@
 <script lang="ts">
 import { auth } from '$lib/stores/auth';
+import { FileText, Eye, MessageCircle, Users, ArrowRight, FolderOpen, Settings } from '@lucide/svelte';
 
 const authState = $derived($auth);
 
 // 模拟数据
 const stats = [
-	{ label: '总文章', value: '156', icon: '📝', color: 'bg-blue-500', trend: '+12%' },
-	{ label: '总访问量', value: '12.5K', icon: '👁️', color: 'bg-green-500', trend: '+8%' },
-	{ label: '评论数', value: '892', icon: '💬', color: 'bg-purple-500', trend: '+23%' },
-	{ label: '用户数', value: '2,341', icon: '👥', color: 'bg-orange-500', trend: '+5%' }
+	{ label: '总文章', value: '156', icon: FileText, color: 'bg-blue-500', trend: '+12%' },
+	{ label: '总访问量', value: '12.5K', icon: Eye, color: 'bg-green-500', trend: '+8%' },
+	{ label: '评论数', value: '892', icon: MessageCircle, color: 'bg-purple-500', trend: '+23%' },
+	{ label: '用户数', value: '2,341', icon: Users, color: 'bg-orange-500', trend: '+5%' }
 ];
 
 const recentPosts = [
@@ -42,8 +43,8 @@ const recentPosts = [
 						<p class="text-3xl font-bold text-slate-900">{stat.value}</p>
 						<p class="text-sm text-green-600 mt-2">{stat.trend}</p>
 					</div>
-					<div class="w-12 h-12 {stat.color} rounded-lg flex items-center justify-center text-2xl">
-						{stat.icon}
+					<div class="w-12 h-12 {stat.color} rounded-lg flex items-center justify-center text-white">
+						<svelte:component this={stat.icon} class="w-6 h-6" />
 					</div>
 				</div>
 			</div>
@@ -101,11 +102,13 @@ const recentPosts = [
 			href="/admin/posts"
 			class="bg-white rounded-xl p-6  border border-slate-200 hover:shadow-md hover:border-emerald-300 transition-all group"
 		>
-			<div class="text-3xl mb-3">📝</div>
+			<div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-3">
+				<FileText class="w-6 h-6 text-emerald-600" />
+			</div>
 			<h4 class="text-lg font-bold text-slate-900 mb-2">创建文章</h4>
 			<p class="text-sm text-slate-600">开始写一篇新文章</p>
-			<div class="mt-4 text-emerald-600 text-sm font-medium group-hover:translate-x-1 transition-transform">
-				前往 →
+			<div class="mt-4 text-emerald-600 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+				前往 <ArrowRight class="w-4 h-4" />
 			</div>
 		</a>
 
@@ -113,11 +116,13 @@ const recentPosts = [
 			href="/admin/categories"
 			class="bg-white rounded-xl p-6  border border-slate-200 hover:shadow-md hover:border-teal-300 transition-all group"
 		>
-			<div class="text-3xl mb-3">🏷️</div>
+			<div class="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center mb-3">
+				<FolderOpen class="w-6 h-6 text-teal-600" />
+			</div>
 			<h4 class="text-lg font-bold text-slate-900 mb-2">分类管理</h4>
 			<p class="text-sm text-slate-600">管理文章分类</p>
-			<div class="mt-4 text-teal-600 text-sm font-medium group-hover:translate-x-1 transition-transform">
-				前往 →
+			<div class="mt-4 text-teal-600 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+				前往 <ArrowRight class="w-4 h-4" />
 			</div>
 		</a>
 
@@ -125,11 +130,13 @@ const recentPosts = [
 			href="/admin/settings"
 			class="bg-white rounded-xl p-6  border border-slate-200 hover:shadow-md hover:border-emerald-300 transition-all group"
 		>
-			<div class="text-3xl mb-3">⚙️</div>
+			<div class="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mb-3">
+				<Settings class="w-6 h-6 text-slate-600" />
+			</div>
 			<h4 class="text-lg font-bold text-slate-900 mb-2">系统设置</h4>
 			<p class="text-sm text-slate-600">配置系统参数</p>
-			<div class="mt-4 text-emerald-600 text-sm font-medium group-hover:translate-x-1 transition-transform">
-				前往 →
+			<div class="mt-4 text-emerald-600 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+				前往 <ArrowRight class="w-4 h-4" />
 			</div>
 		</a>
 	</div>

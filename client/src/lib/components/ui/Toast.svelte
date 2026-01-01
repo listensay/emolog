@@ -2,6 +2,7 @@
 import { scale } from 'svelte/transition';
 import { elasticOut, cubicIn } from 'svelte/easing';
 import type { ToastData, ToastType } from '$lib/stores/toast';
+import { X } from '@lucide/svelte';
 
 let {
 	id,
@@ -70,15 +71,7 @@ $effect(() => {
 		class="toast-close flex-shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-95"
 		aria-label="关闭"
 	>
-		<svg
-			class="w-3.5 h-3.5 stroke-white/70"
-			fill="none"
-			viewBox="0 0 24 24"
-			xmlns="http://www.w3.org/2000/svg"
-		>
-			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"
-			></path>
-		</svg>
+		<X class="w-3.5 h-3.5 stroke-white/70" strokeWidth={2.5} />
 	</button>
 </div>
 

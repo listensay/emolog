@@ -3,6 +3,7 @@
 	import Menu from '$lib/components/ui/Menu.svelte';
 	import { siteConfig } from '$lib/stores/siteConfig';
 	import avatar from '$lib/assets/avatar.png';
+	import { ChevronLeft } from '@lucide/svelte';
 
 	import type { Snippet } from 'svelte';
 
@@ -26,9 +27,7 @@
 		<div class="flex items-center justify-between px-4 py-3">
 			{#if showBackButton}
 				<button onclick={goBack} class="flex items-center gap-1 text-slate-600">
-					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-					</svg>
+					<ChevronLeft class="w-5 h-5" />
 					<span>返回</span>
 				</button>
 			{:else}

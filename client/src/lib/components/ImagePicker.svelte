@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { getAllCategories, CategoryType, type Category } from '$lib/api/category';
 	import { getImageList, uploadImage, type Image } from '$lib/api/image';
+	import { X, Upload, ImageIcon } from '@lucide/svelte';
 
 	let { open = $bindable(false), onSelect = (_url: string) => {} } = $props();
 
@@ -117,14 +118,7 @@
 			<div class="p-4 border-b border-slate-200 flex items-center justify-between">
 				<h3 class="text-lg font-semibold text-slate-900">选择图片</h3>
 				<button onclick={handleClose} class="text-slate-400 hover:text-slate-600">
-					<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						></path>
-					</svg>
+					<X class="w-6 h-6" />
 				</button>
 			</div>
 
@@ -162,14 +156,7 @@
 					<!-- 上传按钮 -->
 					<div class="mb-4">
 						<Button variant="outline" onclick={() => fileInput.click()} loading={isUploading}>
-							<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-								></path>
-							</svg>
+							<Upload class="w-4 h-4 mr-2" />
 							上传图片
 						</Button>
 						<input
@@ -187,14 +174,7 @@
 						</div>
 					{:else if images.length === 0}
 						<div class="flex flex-col items-center justify-center py-12 text-slate-500">
-							<svg class="w-12 h-12 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-								></path>
-							</svg>
+							<ImageIcon class="w-12 h-12 text-slate-300 mb-3" />
 							<p class="text-sm">暂无图片</p>
 						</div>
 					{:else}

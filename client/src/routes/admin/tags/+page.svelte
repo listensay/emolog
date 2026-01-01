@@ -5,6 +5,7 @@
 	import { getTagList, deleteTag } from '$lib/api/tag';
 	import type { Tag } from '$lib/api/tag';
 	import { onMount } from 'svelte';
+	import { Plus, Search, Tag as TagIcon } from '@lucide/svelte';
 
 	let tags: Tag[] = $state([]);
 	let isLoading = $state(false);
@@ -102,14 +103,7 @@
 			<p class="text-sm text-slate-500 mt-1">管理你的所有标签</p>
 		</div>
 		<Button onclick={() => goto('/admin/tags/new')}>
-			<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="2"
-					d="M12 4v16m8-8H4"
-				></path>
-			</svg>
+			<Plus class="w-5 h-5 mr-2" />
 			新建标签
 		</Button>
 	</div>
@@ -126,19 +120,7 @@
 						placeholder="搜索标签名称..."
 						class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
 					/>
-					<svg
-						class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"
-						fill="none"
-						stroke="currentColor"
-						viewBox="0 0 24 24"
-					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-						></path>
-					</svg>
+					<Search class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
 				</div>
 			</div>
 
@@ -161,19 +143,7 @@
 			{:else if filteredTags.length === 0}
 				<div class="px-6 py-12 text-center text-slate-500">
 					<div class="flex flex-col items-center">
-						<svg
-							class="w-16 h-16 text-slate-300 mb-4"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								stroke-width="2"
-								d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-							></path>
-						</svg>
+						<TagIcon class="w-16 h-16 text-slate-300 mb-4" />
 						<p class="text-lg font-medium">暂无标签</p>
 						<p class="text-sm mt-1">创建你的第一个标签吧!</p>
 					</div>
