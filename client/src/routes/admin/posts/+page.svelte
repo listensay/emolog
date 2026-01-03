@@ -7,6 +7,7 @@
 	import { Eye, Heart } from '@lucide/svelte';
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
 
 	let posts: Post[] = $state([]);
 	let isLoading = $state(false);
@@ -76,11 +77,6 @@
 		}
 	}
 
-	function getStatusBadge(post: Post) {
-		if (post.isDeleted) return { text: '已删除', color: 'bg-red-100 text-red-800' };
-		return { text: '已发布', color: 'bg-green-100 text-green-800' };
-	}
-
 	function formatDate(date: string) {
 		return new Date(date).toLocaleDateString('zh-CN');
 	}
@@ -127,9 +123,9 @@
 				<div class="text-xs text-slate-500 mt-1 line-clamp-1" title={post.description}>{post.description}</div>
 			</td>
 			<td class="px-6 py-4">
-				<span class="px-2 py-1 text-xs rounded-full {getStatusBadge(post).color}">
-					{getStatusBadge(post).text}
-				</span>
+				<Badge variant={post.isDeleted ? 'danger' : 'success'}>
+					{post.isDeleted ? '已删除' : '已发布'}
+				</Badge>
 			</td>
 			<td class="px-6 py-4">
 				<div class="text-xs text-slate-600 flex items-center gap-3">

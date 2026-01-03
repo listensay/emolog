@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
 
 	let users: User[] = $state([]);
 	let isLoading = $state(false);
@@ -88,11 +89,6 @@
 		}
 	}
 
-	function getStatusBadge(user: User) {
-		if (user.isActive) return { text: '正常', color: 'bg-green-100 text-green-800' };
-		return { text: '已禁用', color: 'bg-red-100 text-red-800' };
-	}
-
 	function formatDate(date: string) {
 		return new Date(date).toLocaleDateString('zh-CN', {
 			year: 'numeric',
@@ -160,9 +156,9 @@
 				<div class="text-sm text-slate-600">{user.email}</div>
 			</td>
 			<td class="px-6 py-4">
-				<span class="px-2 py-1 text-xs rounded-full {getStatusBadge(user).color}">
-					{getStatusBadge(user).text}
-				</span>
+				<Badge variant={user.isActive ? 'success' : 'danger'}>
+					{user.isActive ? '正常' : '已禁用'}
+				</Badge>
 			</td>
 			<td class="px-6 py-4">
 				<div class="text-sm text-slate-600">{formatDate(user.createdAt)}</div>

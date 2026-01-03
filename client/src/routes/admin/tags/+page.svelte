@@ -6,6 +6,7 @@
 	import { onMount } from 'svelte';
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
 
 	let tags: Tag[] = $state([]);
 	let isLoading = $state(false);
@@ -109,11 +110,7 @@
 
 		{#snippet row(tag)}
 			<td class="px-6 py-4">
-				<span
-					class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-800"
-				>
-					{tag.name}
-				</span>
+				<Badge variant="emerald">{tag.name}</Badge>
 			</td>
 			<td class="px-6 py-4">
 				<div class="text-sm text-slate-600">{formatDate(tag.createdAt)}</div>

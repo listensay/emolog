@@ -6,6 +6,7 @@
 	import { onMount } from 'svelte';
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
 
 	let categories: Category[] = $state([]);
 	let isLoading = $state(false);
@@ -150,9 +151,9 @@
 				</div>
 			</td>
 			<td class="px-6 py-4">
-				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {category.type === CategoryType.POST ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
+				<Badge variant={category.type === CategoryType.POST ? 'info' : 'purple'}>
 					{category.type === CategoryType.POST ? '文章' : '图片'}
-				</span>
+				</Badge>
 			</td>
 			<td class="px-6 py-4">
 				<div class="text-sm text-slate-600 max-w-xs truncate" title={category.description}>

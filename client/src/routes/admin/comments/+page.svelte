@@ -5,6 +5,7 @@
 	import { onMount } from 'svelte';
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
+	import Badge from '$lib/components/ui/Badge.svelte';
 
 	let comments: Comment[] = $state([]);
 	let isLoading = $state(false);
@@ -73,11 +74,6 @@
 				console.error(error);
 			}
 		}
-	}
-
-	function getStatusBadge(comment: Comment) {
-		if (comment.isDeleted) return { text: '已删除', color: 'bg-red-100 text-red-800' };
-		return { text: '正常', color: 'bg-green-100 text-green-800' };
 	}
 
 	function formatDate(date: string) {
@@ -158,9 +154,9 @@
 				</div>
 			</td>
 			<td class="px-6 py-4">
-				<span class="px-2 py-1 text-xs rounded-full {getStatusBadge(comment).color}">
-					{getStatusBadge(comment).text}
-				</span>
+				<Badge variant={comment.isDeleted ? 'danger' : 'success'}>
+					{comment.isDeleted ? '已删除' : '正常'}
+				</Badge>
 			</td>
 			<td class="px-6 py-4">
 				<div class="text-sm text-slate-600">{formatDate(comment.createdAt)}</div>
