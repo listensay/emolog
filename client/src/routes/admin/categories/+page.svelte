@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Button from '$lib/components/ui/Button.svelte';
 	import { goto } from '$app/navigation';
 	import { toast } from '$lib/stores/toast';
 	import { getCategoryList, deleteCategory, CategoryType } from '$lib/api/category';
 	import type { Category } from '$lib/api/category';
 	import { onMount } from 'svelte';
-	import { Plus, Search, Tag } from '@lucide/svelte';
+	import AdminPage from '$lib/components/admin/AdminPage.svelte';
+	import AdminTable from '$lib/components/admin/AdminTable.svelte';
 
 	let categories: Category[] = $state([]);
 	let isLoading = $state(false);
@@ -55,23 +55,6 @@
 		loadCategories();
 	}
 
-	function handleSelectAll(e: Event) {
-		const checked = (e.target as HTMLInputElement).checked;
-		if (checked) {
-			selectedCategories = filteredCategories.map((c) => c.id);
-		} else {
-			selectedCategories = [];
-		}
-	}
-
-	function handleSelectCategory(id: number) {
-		if (selectedCategories.includes(id)) {
-			selectedCategories = selectedCategories.filter((c) => c !== id);
-		} else {
-			selectedCategories = [...selectedCategories, id];
-		}
-	}
-
 	async function handleDelete(id: number) {
 		if (confirm('确定要删除这个分类吗?')) {
 			try {
@@ -108,204 +91,96 @@
 	}
 </script>
 
-<div class="space-y-6">
-	<!-- 页面标题 -->
-	<div class="flex items-center justify-between">
-		<div>
-			<h1 class="text-2xl font-bold text-slate-900">分类管理</h1>
-			<p class="text-sm text-slate-500 mt-1">管理你的所有分类</p>
+<AdminPage
+	title="分类管理"
+	subtitle="管理你的所有分类"
+	createUrl="/admin/categories/new"
+	createText="新建分类"
+	bind:searchQuery
+	searchPlaceholder="搜索分类名称或描述..."
+	{total}
+	bind:currentPage
+	bind:pageSize
+	onBatchDelete={handleBatchDelete}
+	selectedCount={selectedCategories.length}
+>
+	{#snippet filters()}
+		<div class="w-40">
+			<select
+				bind:value={selectedType}
+				onchange={handleTypeChange}
+				class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+			>
+				<option value="">全部类型</option>
+				<option value={CategoryType.POST}>文章分类</option>
+				<option value={CategoryType.IMAGE}>图片分类</option>
+			</select>
 		</div>
-		<Button onclick={() => goto('/admin/categories/new')}>
-			<Plus class="w-5 h-5 mr-2" />
-			新建分类
-		</Button>
-	</div>
+	{/snippet}
 
-	<!-- 搜索和筛选 -->
-	<div class="bg-white rounded-xl  border border-slate-200 p-4">
-		<div class="flex flex-col md:flex-row gap-4">
-			<!-- 搜索框 -->
-			<div class="flex-1">
-				<div class="relative">
-					<input
-						type="text"
-						bind:value={searchQuery}
-						placeholder="搜索分类名称或描述..."
-						class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-					/>
-					<Search class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+	<AdminTable items={filteredCategories} {isLoading} bind:selectedIds={selectedCategories} itemKey="id">
+		{#snippet header()}
+			<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+				名称
+			</th>
+			<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+				类型
+			</th>
+			<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+				描述
+			</th>
+			<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+				排序
+			</th>
+			<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+				创建时间
+			</th>
+			<th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+				操作
+			</th>
+		{/snippet}
+
+		{#snippet row(category)}
+			<td class="px-6 py-4">
+				<div class="flex items-center">
+					{#if category.icon}
+						<span class="mr-2">{category.icon}</span>
+					{/if}
+					<span class="text-sm font-medium text-slate-900">{category.name}</span>
 				</div>
-			</div>
-
-			<!-- 类型筛选 -->
-			<div class="w-40">
-				<select
-					bind:value={selectedType}
-					onchange={handleTypeChange}
-					class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-				>
-					<option value="">全部类型</option>
-					<option value={CategoryType.POST}>文章分类</option>
-					<option value={CategoryType.IMAGE}>图片分类</option>
-				</select>
-			</div>
-
-			<!-- 批量操作 -->
-			{#if selectedCategories.length > 0}
-				<Button variant="outline" onclick={handleBatchDelete} class="text-red-600 border-red-300">
-					删除选中 ({selectedCategories.length})
-				</Button>
-			{/if}
-		</div>
-	</div>
-
-	<!-- 分类列表 -->
-	<div class="bg-white rounded-xl  border border-slate-200 overflow-hidden">
-		<div class="overflow-x-auto">
-			{#if isLoading}
-				<div class="px-6 py-12 text-center text-slate-500">
-					<p>加载中...</p>
+			</td>
+			<td class="px-6 py-4">
+				<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {category.type === CategoryType.POST ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
+					{category.type === CategoryType.POST ? '文章' : '图片'}
+				</span>
+			</td>
+			<td class="px-6 py-4">
+				<div class="text-sm text-slate-600 max-w-xs truncate" title={category.description}>
+					{category.description || '-'}
 				</div>
-			{:else if filteredCategories.length === 0}
-				<div class="px-6 py-12 text-center text-slate-500">
-					<div class="flex flex-col items-center">
-						<Tag class="w-16 h-16 text-slate-300 mb-4" />
-						<p class="text-lg font-medium">暂无分类</p>
-						<p class="text-sm mt-1">创建你的第一个分类吧!</p>
-					</div>
-				</div>
-			{:else}
-				<table class="w-full">
-					<thead class="bg-slate-50 border-b border-slate-200">
-						<tr>
-							<th class="px-6 py-3 text-left">
-								<input
-									type="checkbox"
-									onchange={handleSelectAll}
-									checked={selectedCategories.length === filteredCategories.length &&
-										filteredCategories.length > 0}
-									class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-								/>
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								名称
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								类型
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								描述
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								排序
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								创建时间
-							</th>
-							<th
-								class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								操作
-							</th>
-						</tr>
-					</thead>
-					<tbody class="divide-y divide-slate-200">
-						{#each filteredCategories as category (category.id)}
-							<tr class="hover:bg-slate-50 transition-colors">
-								<td class="px-6 py-4">
-									<input
-										type="checkbox"
-										checked={selectedCategories.includes(category.id)}
-										onchange={() => handleSelectCategory(category.id)}
-										class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-									/>
-								</td>
-								<td class="px-6 py-4">
-									<div class="flex items-center">
-										{#if category.icon}
-											<span class="mr-2">{category.icon}</span>
-										{/if}
-										<span class="text-sm font-medium text-slate-900">{category.name}</span>
-									</div>
-								</td>
-								<td class="px-6 py-4">
-									<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {category.type === CategoryType.POST ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">
-										{category.type === CategoryType.POST ? '文章' : '图片'}
-									</span>
-								</td>
-								<td class="px-6 py-4">
-									<div class="text-sm text-slate-600 max-w-xs truncate">
-										{category.description || '-'}
-									</div>
-								</td>
-								<td class="px-6 py-4">
-									<span class="text-sm text-slate-600">{category.order}</span>
-								</td>
-								<td class="px-6 py-4">
-									<div class="text-sm text-slate-600">{formatDate(category.createdAt)}</div>
-								</td>
-								<td class="px-6 py-4 text-right">
-									<div class="flex items-center justify-end gap-2">
-										<button
-											onclick={() => goto(`/admin/categories/${category.id}`)}
-											class="text-emerald-600 hover:text-emerald-900 text-sm font-medium"
-										>
-											编辑
-										</button>
-										<button
-											onclick={() => handleDelete(category.id)}
-											class="text-red-600 hover:text-red-900 text-sm font-medium"
-										>
-											删除
-										</button>
-									</div>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			{/if}
-		</div>
-
-		<!-- 分页 -->
-		{#if !isLoading && filteredCategories.length > 0}
-			<div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
-				<div class="text-sm text-slate-600">
-					显示 {filteredCategories.length} / {total} 条结果
-				</div>
-				<div class="flex gap-2">
-					<Button
-						variant="outline"
-						disabled={currentPage === 1}
-						onclick={() => {
-							currentPage--;
-							loadCategories();
-						}}
+			</td>
+			<td class="px-6 py-4">
+				<span class="text-sm text-slate-600">{category.order}</span>
+			</td>
+			<td class="px-6 py-4">
+				<div class="text-sm text-slate-600">{formatDate(category.createdAt)}</div>
+			</td>
+			<td class="px-6 py-4 text-right">
+				<div class="flex items-center justify-end gap-2">
+					<button
+						onclick={() => goto(`/admin/categories/${category.id}`)}
+						class="text-emerald-600 hover:text-emerald-900 text-sm font-medium"
 					>
-						上一页
-					</Button>
-					<Button
-						variant="outline"
-						disabled={currentPage * pageSize >= total}
-						onclick={() => {
-							currentPage++;
-							loadCategories();
-						}}
+						编辑
+					</button>
+					<button
+						onclick={() => handleDelete(category.id)}
+						class="text-red-600 hover:text-red-900 text-sm font-medium"
 					>
-						下一页
-					</Button>
+						删除
+					</button>
 				</div>
-			</div>
-		{/if}
-	</div>
-</div>
+			</td>
+		{/snippet}
+	</AdminTable>
+</AdminPage>

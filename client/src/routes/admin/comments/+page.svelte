@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Button from '$lib/components/ui/Button.svelte';
 	import { toast } from '$lib/stores/toast';
 	import { getCommentList, deleteComment } from '$lib/api/comment';
 	import type { Comment } from '$lib/api/comment';
 	import { onMount } from 'svelte';
-	import { Search, MessageCircle } from '@lucide/svelte';
+	import AdminPage from '$lib/components/admin/AdminPage.svelte';
+	import AdminTable from '$lib/components/admin/AdminTable.svelte';
 
 	let comments: Comment[] = $state([]);
 	let isLoading = $state(false);
@@ -41,23 +41,6 @@
 			console.error(error);
 		} finally {
 			isLoading = false;
-		}
-	}
-
-	function handleSelectAll(e: Event) {
-		const checked = (e.target as HTMLInputElement).checked;
-		if (checked) {
-			selectedComments = filteredComments.map((c) => c.id);
-		} else {
-			selectedComments = [];
-		}
-	}
-
-	function handleSelectComment(id: number) {
-		if (selectedComments.includes(id)) {
-			selectedComments = selectedComments.filter((c) => c !== id);
-		} else {
-			selectedComments = [...selectedComments, id];
 		}
 	}
 
@@ -113,187 +96,85 @@
 	}
 </script>
 
-<div class="space-y-6">
-	<!-- 页面标题 -->
-	<div class="flex items-center justify-between">
-		<div>
-			<h1 class="text-2xl font-bold text-slate-900">评论管理</h1>
-			<p class="text-sm text-slate-500 mt-1">管理所有用户评论</p>
-		</div>
-	</div>
+<AdminPage
+	title="评论管理"
+	subtitle="管理所有用户评论"
+	bind:searchQuery
+	searchPlaceholder="搜索评论内容、用户名或邮箱..."
+	{total}
+	bind:currentPage
+	bind:pageSize
+	onBatchDelete={handleBatchDelete}
+	selectedCount={selectedComments.length}
+>
+	<AdminTable items={filteredComments} {isLoading} bind:selectedIds={selectedComments} itemKey="id">
+		{#snippet header()}
+			<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+				评论者
+			</th>
+			<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+				评论内容
+			</th>
+			<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+				关联文章
+			</th>
+			<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+				状态
+			</th>
+			<th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+				评论时间
+			</th>
+			<th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
+				操作
+			</th>
+		{/snippet}
 
-	<!-- 搜索和筛选 -->
-	<div class="bg-white rounded-xl  border border-slate-200 p-4">
-		<div class="flex flex-col md:flex-row gap-4">
-			<!-- 搜索框 -->
-			<div class="flex-1">
-				<div class="relative">
-					<input
-						type="text"
-						bind:value={searchQuery}
-						placeholder="搜索评论内容、用户名或邮箱..."
-						class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-					/>
-					<Search class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+		{#snippet row(comment)}
+			<td class="px-6 py-4">
+				<div class="text-sm font-medium text-slate-900">
+					{comment.username || comment.user?.username || '匿名用户'}
 				</div>
-			</div>
-
-			<!-- 批量操作 -->
-			{#if selectedComments.length > 0}
-				<Button variant="outline" onclick={handleBatchDelete} class="text-red-600 border-red-300">
-					删除选中 ({selectedComments.length})
-				</Button>
-			{/if}
-		</div>
-	</div>
-
-	<!-- 评论列表 -->
-	<div class="bg-white rounded-xl  border border-slate-200 overflow-hidden">
-		<div class="overflow-x-auto">
-			{#if isLoading}
-				<div class="px-6 py-12 text-center text-slate-500">
-					<p>加载中...</p>
+				<div class="text-xs text-slate-500 mt-1">{comment.email || '-'}</div>
+			</td>
+			<td class="px-6 py-4">
+				<div class="text-sm text-slate-600 max-w-xs" title={comment.content}>
+					{truncateContent(comment.content)}
 				</div>
-			{:else if filteredComments.length === 0}
-				<div class="px-6 py-12 text-center text-slate-500">
-					<div class="flex flex-col items-center">
-						<MessageCircle class="w-16 h-16 text-slate-300 mb-4" />
-						<p class="text-lg font-medium">暂无评论</p>
-						<p class="text-sm mt-1">还没有用户发表评论</p>
+				{#if comment.parentCommentId}
+					<div class="text-xs text-slate-400 mt-1">
+						回复评论 #{comment.parentCommentId}
 					</div>
-				</div>
-			{:else}
-				<table class="w-full">
-					<thead class="bg-slate-50 border-b border-slate-200">
-						<tr>
-							<th class="px-6 py-3 text-left">
-								<input
-									type="checkbox"
-									onchange={handleSelectAll}
-									checked={selectedComments.length === filteredComments.length && filteredComments.length > 0}
-									class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-								/>
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								评论者
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								评论内容
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								关联文章
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								状态
-							</th>
-							<th
-								class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								评论时间
-							</th>
-							<th
-								class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider"
-							>
-								操作
-							</th>
-						</tr>
-					</thead>
-					<tbody class="divide-y divide-slate-200">
-						{#each filteredComments as comment (comment.id)}
-							<tr class="hover:bg-slate-50 transition-colors">
-								<td class="px-6 py-4">
-									<input
-										type="checkbox"
-										checked={selectedComments.includes(comment.id)}
-										onchange={() => handleSelectComment(comment.id)}
-										class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-									/>
-								</td>
-								<td class="px-6 py-4">
-									<div class="text-sm font-medium text-slate-900">
-										{comment.username || comment.user?.username || '匿名用户'}
-									</div>
-									<div class="text-xs text-slate-500 mt-1">{comment.email || '-'}</div>
-								</td>
-								<td class="px-6 py-4">
-									<div class="text-sm text-slate-600 max-w-xs">
-										{truncateContent(comment.content)}
-									</div>
-									{#if comment.parentCommentId}
-										<div class="text-xs text-slate-400 mt-1">
-											回复评论 #{comment.parentCommentId}
-										</div>
-									{/if}
-								</td>
-								<td class="px-6 py-4">
-									<div class="text-sm text-slate-600">
-										{#if comment.post}
-											<a href="/admin/posts/{comment.post.id}" class="text-emerald-600 hover:text-emerald-900">
-												{truncateContent(comment.post.title, 20)}
-											</a>
-										{:else}
-											文章 #{comment.postId}
-										{/if}
-									</div>
-								</td>
-								<td class="px-6 py-4">
-									<span class="px-2 py-1 text-xs rounded-full {getStatusBadge(comment).color}">
-										{getStatusBadge(comment).text}
-									</span>
-								</td>
-								<td class="px-6 py-4">
-									<div class="text-sm text-slate-600">{formatDate(comment.createdAt)}</div>
-								</td>
-								<td class="px-6 py-4 text-right">
-									<div class="flex items-center justify-end gap-2">
-										<button
-											onclick={() => handleDelete(comment.id)}
-											class="text-red-600 hover:text-red-900 text-sm font-medium"
-										>
-											删除
-										</button>
-									</div>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			{/if}
-		</div>
-
-		<!-- 分页 -->
-		{#if !isLoading && filteredComments.length > 0}
-			<div class="px-6 py-4 border-t border-slate-200 flex items-center justify-between">
+				{/if}
+			</td>
+			<td class="px-6 py-4">
 				<div class="text-sm text-slate-600">
-					显示 {filteredComments.length} / {total} 条结果
+					{#if comment.post}
+						<a href="/admin/posts/{comment.post.id}" class="text-emerald-600 hover:text-emerald-900">
+							{truncateContent(comment.post.title, 20)}
+						</a>
+					{:else}
+						文章 #{comment.postId}
+					{/if}
 				</div>
-				<div class="flex gap-2">
-					<Button
-						variant="outline"
-						disabled={currentPage === 1}
-						onclick={() => {
-							currentPage--;
-							loadComments();
-						}}
+			</td>
+			<td class="px-6 py-4">
+				<span class="px-2 py-1 text-xs rounded-full {getStatusBadge(comment).color}">
+					{getStatusBadge(comment).text}
+				</span>
+			</td>
+			<td class="px-6 py-4">
+				<div class="text-sm text-slate-600">{formatDate(comment.createdAt)}</div>
+			</td>
+			<td class="px-6 py-4 text-right">
+				<div class="flex items-center justify-end gap-2">
+					<button
+						onclick={() => handleDelete(comment.id)}
+						class="text-red-600 hover:text-red-900 text-sm font-medium"
 					>
-						上一页
-					</Button>
-					<Button variant="outline" disabled={currentPage * pageSize >= total} onclick={() => {
-						currentPage++;
-						loadComments();
-					}}>
-						下一页
-					</Button>
+						删除
+					</button>
 				</div>
-			</div>
-		{/if}
-	</div>
-</div>
+			</td>
+		{/snippet}
+	</AdminTable>
+</AdminPage>
