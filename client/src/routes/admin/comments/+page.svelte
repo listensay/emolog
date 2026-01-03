@@ -6,6 +6,7 @@
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
 
 	let comments: Comment[] = $state([]);
 	let isLoading = $state(false);
@@ -15,6 +16,11 @@
 
 	let searchQuery = $state('');
 	let selectedComments = $state<number[]>([]);
+
+	$effect(() => {
+		pageTitle.set('评论管理');
+		pageSubtitle.set('管理所有用户评论');
+	});
 
 	const filteredComments = $derived(
 		comments.filter((comment) => {
@@ -93,8 +99,6 @@
 </script>
 
 <AdminPage
-	title="评论管理"
-	subtitle="管理所有用户评论"
 	bind:searchQuery
 	searchPlaceholder="搜索评论内容、用户名或邮箱..."
 	{total}

@@ -1,20 +1,18 @@
 <script lang="ts">
-import { auth } from '$lib/stores/auth';
-import { goto } from '$app/navigation';
-import { toast } from '$lib/stores/toast';
-import Button from '$lib/components/ui/Button.svelte';
-import type { Snippet } from 'svelte';
-import { Bell, LogOut } from '@lucide/svelte';
+	import { auth } from '$lib/stores/auth';
+	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
+	import { goto } from '$app/navigation';
+	import { toast } from '$lib/stores/toast';
+	import Button from '$lib/components/ui/Button.svelte';
+	import { Bell, LogOut } from '@lucide/svelte';
 
-const authState = $derived($auth);
+	const authState = $derived($auth);
 
-let { title, subtitle }: { title?: Snippet; subtitle?: Snippet } = $props();
-
-function handleLogout() {
-	auth.logout();
-	toast.info('已退出登录');
-	goto('/auth/login');
-}
+	function handleLogout() {
+		auth.logout();
+		toast.info('已退出登录');
+		goto('/auth/login');
+	}
 </script>
 
 <header class="bg-white border-b border-slate-200 sticky top-0 z-10">
@@ -23,19 +21,13 @@ function handleLogout() {
 			<!-- 左侧：页面标题 -->
 			<div>
 				<h2 class="text-2xl font-bold text-slate-900">
-					{#if title}
-						{@render title()}
-					{:else}
-						仪表盘
-					{/if}
+					{$pageTitle || '仪表盘'}
 				</h2>
-				<p class="text-sm text-slate-500 mt-1">
-					{#if subtitle}
-						{@render subtitle()}
-					{:else}
-						欢迎回来!
-					{/if}
-				</p>
+				{#if $pageSubtitle}
+					<p class="text-sm text-slate-500 mt-1">
+						{$pageSubtitle}
+					</p>
+				{/if}
 			</div>
 
 			<!-- 右侧：用户信息 -->

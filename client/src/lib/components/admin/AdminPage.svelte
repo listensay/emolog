@@ -5,8 +5,6 @@
 	import type { Snippet } from 'svelte';
 
 	let {
-		title,
-		subtitle,
 		createUrl,
 		createText = '新建',
 		searchQuery = $bindable(''),
@@ -20,8 +18,6 @@
 		actions,
 		children
 	}: {
-		title: string;
-		subtitle?: string;
 		createUrl?: string;
 		createText?: string;
 		searchQuery?: string;
@@ -42,21 +38,15 @@
 </script>
 
 <div class="space-y-6">
-	<!-- 页面标题 -->
-	<div class="flex items-center justify-between">
-		<div>
-			<h1 class="text-2xl font-bold text-slate-900">{title}</h1>
-			{#if subtitle}
-				<p class="text-sm text-slate-500 mt-1">{subtitle}</p>
-			{/if}
-		</div>
-		{#if createUrl}
+	<!-- 页面标题区域：仅保留操作按钮，因为标题已移至全局 Header -->
+	{#if createUrl}
+		<div class="flex items-center justify-end">
 			<Button onclick={() => goto(createUrl)}>
 				<Plus class="w-5 h-5 mr-2" />
 				{createText}
 			</Button>
-		{/if}
-	</div>
+		</div>
+	{/if}
 
 	<!-- 搜索和筛选 -->
 	<div class="bg-white rounded-xl border border-slate-200 p-4">

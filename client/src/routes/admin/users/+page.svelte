@@ -6,6 +6,7 @@
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
 
 	let users: User[] = $state([]);
 	let isLoading = $state(false);
@@ -15,6 +16,11 @@
 
 	let searchQuery = $state('');
 	let selectedUsers = $state<number[]>([]);
+
+	$effect(() => {
+		pageTitle.set('用户管理');
+		pageSubtitle.set('管理系统用户账户');
+	});
 
 	const filteredUsers = $derived(
 		users.filter((user) => {
@@ -101,8 +107,6 @@
 </script>
 
 <AdminPage
-	title="用户管理"
-	subtitle="管理系统用户账户"
 	bind:searchQuery
 	searchPlaceholder="搜索用户名、邮箱或昵称..."
 	{total}

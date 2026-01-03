@@ -8,6 +8,7 @@
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
 
 	let posts: Post[] = $state([]);
 	let isLoading = $state(false);
@@ -17,6 +18,11 @@
 
 	let searchQuery = $state('');
 	let selectedPosts = $state<number[]>([]);
+
+	$effect(() => {
+		pageTitle.set('文章管理');
+		pageSubtitle.set('管理你的所有文章');
+	});
 
 	const filteredPosts = $derived(
 		posts.filter((post) => {
@@ -83,8 +89,6 @@
 </script>
 
 <AdminPage
-	title="文章管理"
-	subtitle="管理你的所有文章"
 	createUrl="/admin/posts/new"
 	createText="新建文章"
 	bind:searchQuery

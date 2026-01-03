@@ -7,6 +7,7 @@
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
 
 	let categories: Category[] = $state([]);
 	let isLoading = $state(false);
@@ -17,6 +18,11 @@
 	let searchQuery = $state('');
 	let selectedCategories = $state<number[]>([]);
 	let selectedType = $state<CategoryType | ''>('');
+
+	$effect(() => {
+		pageTitle.set('分类管理');
+		pageSubtitle.set('管理你的所有分类');
+	});
 
 	const filteredCategories = $derived(
 		categories.filter((category) => {
@@ -93,8 +99,6 @@
 </script>
 
 <AdminPage
-	title="分类管理"
-	subtitle="管理你的所有分类"
 	createUrl="/admin/categories/new"
 	createText="新建分类"
 	bind:searchQuery

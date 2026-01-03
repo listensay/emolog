@@ -7,6 +7,7 @@
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
+	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
 
 	let tags: Tag[] = $state([]);
 	let isLoading = $state(false);
@@ -16,6 +17,11 @@
 
 	let searchQuery = $state('');
 	let selectedTags = $state<number[]>([]);
+
+	$effect(() => {
+		pageTitle.set('标签管理');
+		pageSubtitle.set('管理你的所有标签');
+	});
 
 	const filteredTags = $derived(
 		tags.filter((tag) => {
@@ -80,8 +86,6 @@
 </script>
 
 <AdminPage
-	title="标签管理"
-	subtitle="管理你的所有标签"
 	createUrl="/admin/tags/new"
 	createText="新建标签"
 	bind:searchQuery
