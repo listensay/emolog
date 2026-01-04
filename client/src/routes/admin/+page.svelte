@@ -9,10 +9,10 @@
 	import type { Post } from '$lib/api/post';
 
 	let stats = $state([
-		{ label: '总文章', value: '0', icon: FileText, color: 'bg-blue-500', trend: '-' },
-		{ label: '总访问量', value: '-', icon: Eye, color: 'bg-green-500', trend: '-' },
-		{ label: '评论数', value: '0', icon: MessageCircle, color: 'bg-purple-500', trend: '-' },
-		{ label: '用户数', value: '0', icon: Users, color: 'bg-orange-500', trend: '-' }
+		{ label: '总文章', value: '0', icon: FileText, color: 'text-blue-500', trend: '-' },
+		{ label: '总访问量', value: '-', icon: Eye, color: 'text-green-500', trend: '-' },
+		{ label: '评论数', value: '0', icon: MessageCircle, color: 'text-purple-500', trend: '-' },
+		{ label: '用户数', value: '0', icon: Users, color: 'text-orange-500', trend: '-' }
 	]);
 
 	$effect(() => {
@@ -66,10 +66,9 @@
 				<div class="flex items-start justify-between">
 					<div>
 						<p class="text-sm text-slate-600 mb-1">{stat.label}</p>
-						<p class="text-3xl font-bold text-slate-900">{stat.value}</p>
-						<p class="text-sm text-slate-400 mt-2">{stat.trend !== '-' ? stat.trend : '暂无趋势数据'}</p>
+						<p class="text-xl text-slate-900">{stat.value}</p>
 					</div>
-					<div class="w-12 h-12 {stat.color} rounded-lg flex items-center justify-center text-white">
+					<div class="w-12 h-12 {stat.color} rounded-lg flex items-center justify-center">
 						<svelte:component this={stat.icon} class="w-6 h-6" />
 					</div>
 				</div>
@@ -88,7 +87,7 @@
 			</div>
 			<h4 class="text-lg font-bold text-slate-900 mb-2">创建文章</h4>
 			<p class="text-sm text-slate-600">管理与发布内容</p>
-			<div class="mt-4 text-emerald-600 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+			<div class="mt-4 text-emerald-600 text-sm font-medium flex items-center gap-1">
 				前往 <ArrowRight class="w-4 h-4" />
 			</div>
 		</a>
@@ -102,7 +101,7 @@
 			</div>
 			<h4 class="text-lg font-bold text-slate-900 mb-2">分类管理</h4>
 			<p class="text-sm text-slate-600">组织文章结构</p>
-			<div class="mt-4 text-teal-600 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+			<div class="mt-4 text-teal-600 text-sm font-medium flex items-center gap-1">
 				前往 <ArrowRight class="w-4 h-4" />
 			</div>
 		</a>
@@ -116,7 +115,7 @@
 			</div>
 			<h4 class="text-lg font-bold text-slate-900 mb-2">用户管理</h4>
 			<p class="text-sm text-slate-600">查看注册用户</p>
-			<div class="mt-4 text-emerald-600 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+			<div class="mt-4 text-emerald-600 text-sm font-medium flex items-center gap-1">
 				前往 <ArrowRight class="w-4 h-4" />
 			</div>
 		</a>
