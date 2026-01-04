@@ -6,6 +6,7 @@
 
 	let {
 		createUrl,
+		onCreate,
 		createText = '新建',
 		searchQuery = $bindable(''),
 		searchPlaceholder = '搜索...',
@@ -19,6 +20,7 @@
 		children
 	}: {
 		createUrl?: string;
+		onCreate?: () => void;
 		createText?: string;
 		searchQuery?: string;
 		searchPlaceholder?: string;
@@ -35,13 +37,21 @@
 	function handlePageChange(page: number) {
 		currentPage = page;
 	}
+
+	function handleCreate() {
+		if (onCreate) {
+			onCreate();
+		} else if (createUrl) {
+			goto(createUrl);
+		}
+	}
 </script>
 
 <div class="space-y-6">
 	<!-- 页面标题区域：仅保留操作按钮，因为标题已移至全局 Header -->
-	{#if createUrl}
+	{#if createUrl || onCreate}
 		<div class="flex items-center justify-end">
-			<Button onclick={() => goto(createUrl)}>
+			<Button onclick={handleCreate}>
 				<Plus class="w-5 h-5 mr-2" />
 				{createText}
 			</Button>

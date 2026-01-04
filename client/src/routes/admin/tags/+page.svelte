@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { toast } from '$lib/stores/toast';
-	import { getTagList, deleteTag } from '$lib/api/tag';
+	import { getTagList, deleteTag, updateTag, createTag } from '$lib/api/tag';
 	import type { Tag } from '$lib/api/tag';
 	import { onMount } from 'svelte';
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
+	import EditModal from '$lib/components/admin/EditModal.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
 
@@ -17,6 +17,14 @@
 
 	let searchQuery = $state('');
 	let selectedTags = $state<number[]>([]);
+
+	// 编辑弹窗
+	let showEditModal = $state(false);
+	let editingTag = $state<Tag | null>(null);
+
+	// 新建弹窗
+	let showCreateModal = $state(false);
+	let newTag = $state({ name: '' });
 
 	$effect(() => {
 		pageTitle.set('标签管理');
@@ -80,14 +88,31 @@
 		}
 	}
 
+	function openEditModal(tag: Tag) {
+		editingTag = tag;
+		showEditModal = true;
+	}
+
+	async function handleEditSubmit(data: Tag) {
+		if (!editingTag) return;
+		await updateTag(editingTag.id, { name: data.name });
+		await loadTags();
+	}
+
+	async function handleCreateSubmit(data: { name: string }) {
+		await createTag({ name: data.name });
+		await loadTags();
+		newTag = { name: '' };
+	}
+
 	function formatDate(date: string) {
 		return new Date(date).toLocaleDateString('zh-CN');
 	}
 </script>
 
 <AdminPage
-	createUrl="/admin/tags/new"
 	createText="新建标签"
+	onCreate={() => (showCreateModal = true)}
 	bind:searchQuery
 	searchPlaceholder="搜索标签名称..."
 	{total}
@@ -125,7 +150,7 @@
 			<td class="px-6 py-4 text-right">
 				<div class="flex items-center justify-end gap-2">
 					<button
-						onclick={() => goto(`/admin/tags/${tag.id}`)}
+						onclick={() => openEditModal(tag)}
 						class="text-emerald-600 hover:text-emerald-900 text-sm font-medium"
 					>
 						编辑
@@ -141,3 +166,23 @@
 		{/snippet}
 	</AdminTable>
 </AdminPage>
+
+<!-- 编辑弹窗 -->
+<EditModal
+	bind:open={showEditModal}
+	title="编辑标签"
+	data={editingTag}
+	fields={[{ name: 'name', label: '标签名称', type: 'text', required: true }]}
+	onSubmit={handleEditSubmit}
+	onClose={() => {}}
+/>
+
+<!-- 新建弹窗 -->
+<EditModal
+	bind:open={showCreateModal}
+	title="新建标签"
+	data={newTag}
+	fields={[{ name: 'name', label: '标签名称', type: 'text', required: true }]}
+	onSubmit={handleCreateSubmit}
+	onClose={() => {}}
+/>

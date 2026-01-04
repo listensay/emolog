@@ -1,11 +1,17 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { toast } from '$lib/stores/toast';
-	import { getCategoryList, deleteCategory, CategoryType } from '$lib/api/category';
+	import {
+		getCategoryList,
+		deleteCategory,
+		updateCategory,
+		createCategory,
+		CategoryType
+	} from '$lib/api/category';
 	import type { Category } from '$lib/api/category';
 	import { onMount } from 'svelte';
 	import AdminPage from '$lib/components/admin/AdminPage.svelte';
 	import AdminTable from '$lib/components/admin/AdminTable.svelte';
+	import EditModal from '$lib/components/admin/EditModal.svelte';
 	import Badge from '$lib/components/ui/Badge.svelte';
 	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
 
@@ -18,6 +24,20 @@
 	let searchQuery = $state('');
 	let selectedCategories = $state<number[]>([]);
 	let selectedType = $state<CategoryType | ''>('');
+
+	// 编辑弹窗
+	let showEditModal = $state(false);
+	let editingCategory = $state<Category | null>(null);
+
+	// 新建弹窗
+	let showCreateModal = $state(false);
+	let newCategory = $state({
+		name: '',
+		description: '',
+		icon: '',
+		order: 0,
+		type: CategoryType.POST
+	});
 
 	$effect(() => {
 		pageTitle.set('分类管理');
@@ -93,14 +113,49 @@
 		}
 	}
 
+	function openEditModal(category: Category) {
+		editingCategory = category;
+		showEditModal = true;
+	}
+
+	async function handleEditSubmit(data: Category) {
+		if (!editingCategory) return;
+		await updateCategory(editingCategory.id, {
+			name: data.name,
+			description: data.description || undefined,
+			icon: data.icon || undefined,
+			order: data.order,
+			type: data.type
+		});
+		await loadCategories();
+	}
+
+	async function handleCreateSubmit(data: typeof newCategory) {
+		await createCategory({
+			name: data.name,
+			description: data.description || undefined,
+			icon: data.icon || undefined,
+			order: data.order,
+			type: data.type
+		});
+		await loadCategories();
+		newCategory = {
+			name: '',
+			description: '',
+			icon: '',
+			order: 0,
+			type: CategoryType.POST
+		};
+	}
+
 	function formatDate(date: string) {
 		return new Date(date).toLocaleDateString('zh-CN');
 	}
 </script>
 
 <AdminPage
-	createUrl="/admin/categories/new"
 	createText="新建分类"
+	onCreate={() => (showCreateModal = true)}
 	bind:searchQuery
 	searchPlaceholder="搜索分类名称或描述..."
 	{total}
@@ -173,7 +228,7 @@
 			<td class="px-6 py-4 text-right">
 				<div class="flex items-center justify-end gap-2">
 					<button
-						onclick={() => goto(`/admin/categories/${category.id}`)}
+						onclick={() => openEditModal(category)}
 						class="text-emerald-600 hover:text-emerald-900 text-sm font-medium"
 					>
 						编辑
@@ -189,3 +244,65 @@
 		{/snippet}
 	</AdminTable>
 </AdminPage>
+
+<!-- 编辑弹窗 -->
+<EditModal
+	bind:open={showEditModal}
+	title="编辑分类"
+	data={editingCategory}
+	fields={[
+		{ name: 'name', label: '分类名称', type: 'text', required: true },
+		{
+			name: 'type',
+			label: '分类类型',
+			type: 'select',
+			hint: '选择分类用于文章还是图片',
+			options: [
+				{ value: CategoryType.POST, label: '文章分类' },
+				{ value: CategoryType.IMAGE, label: '图片分类' }
+			]
+		},
+		{
+			name: 'description',
+			label: '分类描述',
+			type: 'textarea',
+			hint: '可选，用于描述该分类的用途',
+			rows: 3
+		},
+		{ name: 'icon', label: '分类图标', type: 'text', placeholder: '输入图标（emoji或图标名称）...' },
+		{ name: 'order', label: '排序值', type: 'number', hint: '数值越小排序越靠前', min: 0 }
+	]}
+	onSubmit={handleEditSubmit}
+	onClose={() => {}}
+/>
+
+<!-- 新建弹窗 -->
+<EditModal
+	bind:open={showCreateModal}
+	title="新建分类"
+	data={newCategory}
+	fields={[
+		{ name: 'name', label: '分类名称', type: 'text', required: true },
+		{
+			name: 'type',
+			label: '分类类型',
+			type: 'select',
+			hint: '选择分类用于文章还是图片',
+			options: [
+				{ value: CategoryType.POST, label: '文章分类' },
+				{ value: CategoryType.IMAGE, label: '图片分类' }
+			]
+		},
+		{
+			name: 'description',
+			label: '分类描述',
+			type: 'textarea',
+			hint: '可选，用于描述该分类的用途',
+			rows: 3
+		},
+		{ name: 'icon', label: '分类图标', type: 'text', placeholder: '输入图标（emoji或图标名称）...' },
+		{ name: 'order', label: '排序值', type: 'number', hint: '数值越小排序越靠前', min: 0 }
+	]}
+	onSubmit={handleCreateSubmit}
+	onClose={() => {}}
+/>
