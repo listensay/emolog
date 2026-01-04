@@ -129,10 +129,7 @@
 	<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 		<!-- 主编辑区 -->
 		<div class="lg:col-span-2 space-y-6">
-			<!-- 基本信息 -->
 			<div class="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
-				<h2 class="text-lg font-semibold text-slate-900">基本信息</h2>
-
 				<Input
 					id="title"
 					label="文章标题"
@@ -156,9 +153,7 @@
 				</div>
 			</div>
 
-			<!-- 内容编辑 -->
 			<div class="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
-				<h2 class="text-lg font-semibold text-slate-900">文章内容</h2>
 				<TiptapEditor bind:content class="text-base" />
 				<p class="text-xs text-slate-500">
 					快捷键: Ctrl+B(粗体) | Ctrl+I(斜体) | Ctrl+U(下划线)
@@ -168,10 +163,7 @@
 
 		<!-- 侧边栏设置 -->
 		<div class="space-y-6">
-			<!-- 发布设置 -->
 			<div class="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
-				<h3 class="text-lg font-semibold text-slate-900">发布设置</h3>
-
 				<div>
 					<label for="categoryId" class="block text-sm font-medium text-slate-700 mb-2">
 						分类
@@ -260,11 +252,8 @@
 				</div>
 			</div>
 
-			<!-- 文章信息（仅编辑模式） -->
 			{#if mode === 'edit' && post}
 				<div class="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
-					<h3 class="text-lg font-semibold text-slate-900">文章信息</h3>
-
 					<div class="space-y-3 text-sm">
 						<div class="flex justify-between items-center">
 							<span class="text-slate-600">浏览次数</span>
@@ -296,9 +285,7 @@
 				</div>
 			{/if}
 
-			<!-- 封面图片 -->
 			<div class="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
-				<h3 class="text-lg font-semibold text-slate-900">封面图片</h3>
 
 				{#if coverImage}
 					<div class="relative rounded-lg overflow-hidden border border-slate-200">
