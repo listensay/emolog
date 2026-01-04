@@ -46,7 +46,7 @@
 							: 'text-slate-300 hover:bg-slate-800 hover:text-white'}"
 					>
 						<Icon class="w-5 h-5" />
-						<span class="font-medium">{item.label}</span>
+						<span>{item.label}</span>
 					</a>
 				</li>
 			{/each}
