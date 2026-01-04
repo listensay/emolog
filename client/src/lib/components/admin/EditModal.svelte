@@ -98,21 +98,18 @@
 						</label>
 
 						{#if field.type === 'text'}
-							<input
+							<Input
 								id={field.name}
-								type="text"
 								bind:value={formData[field.name]}
 								placeholder={field.placeholder || `请输入${field.label}...`}
-								class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
 							/>
 						{:else if field.type === 'number'}
-							<input
+							<Input
 								id={field.name}
 								type="number"
 								bind:value={formData[field.name]}
 								min={field.min}
 								placeholder={field.placeholder || `请输入${field.label}...`}
-								class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
 							/>
 						{:else if field.type === 'textarea'}
 							<textarea

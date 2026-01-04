@@ -31,14 +31,6 @@
 </script>
 
 <aside class="w-64 bg-slate-900 text-white flex flex-col h-screen sticky top-0">
-	<!-- Logo -->
-	<div class="p-6 border-b border-slate-800">
-		<h1 class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-			Emolog
-		</h1>
-		<p class="text-xs text-slate-400 mt-1">后台管理系统</p>
-	</div>
-
 	<!-- Navigation -->
 	<nav class="flex-1 overflow-y-auto p-4">
 		<ul class="space-y-1">

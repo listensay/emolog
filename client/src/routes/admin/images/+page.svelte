@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
 	import EditModal from '$lib/components/admin/EditModal.svelte';
 	import { toast } from '$lib/stores/toast';
 	import { onMount } from 'svelte';
@@ -424,18 +425,13 @@
 		<div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
 			<h3 class="text-lg font-semibold text-slate-900 mb-4">新建图片分类</h3>
 			<div class="space-y-4">
-				<div>
-					<label for="categoryName" class="block text-sm font-medium text-slate-700 mb-1">
-						分类名称 <span class="text-red-500">*</span>
-					</label>
-					<input
-						id="categoryName"
-						type="text"
-						bind:value={newCategoryName}
-						placeholder="请输入分类名称..."
-						class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-					/>
-				</div>
+				<Input
+					id="categoryName"
+					label="分类名称"
+					bind:value={newCategoryName}
+					placeholder="请输入分类名称..."
+					required
+				/>
 				<div>
 					<label for="categoryDesc" class="block text-sm font-medium text-slate-700 mb-1">
 						分类描述

@@ -184,11 +184,10 @@
 						{/if}
 					</div>
 					<div class="flex gap-2">
-						<input
-							type="text"
+						<Input
 							bind:value={newTagName}
 							placeholder="新建标签..."
-							class="flex-1 px-3 py-1.5 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+							class="flex-1 text-sm"
 							onkeydown={(e) => e.key === 'Enter' && (e.preventDefault(), handleCreateTag())}
 						/>
 						<Button

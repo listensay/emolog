@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/ui/Button.svelte';
+	import Input from '$lib/components/ui/Input.svelte';
 	import { goto } from '$app/navigation';
 	import { Plus, Search } from '@lucide/svelte';
 	import type { Snippet } from 'svelte';
@@ -48,50 +49,52 @@
 </script>
 
 <div class="space-y-6">
-	<!-- 页面标题区域：仅保留操作按钮，因为标题已移至全局 Header -->
-	{#if createUrl || onCreate}
-		<div class="flex items-center justify-end">
-			<Button onclick={handleCreate}>
-				<Plus class="w-5 h-5 mr-2" />
-				{createText}
-			</Button>
-		</div>
-	{/if}
-
-	<!-- 搜索和筛选 -->
+	<!-- 操作栏：按钮组和搜索 -->
 	<div class="bg-white rounded-xl border border-slate-200 p-4">
-		<div class="flex flex-col md:flex-row gap-4">
-			<!-- 搜索框 -->
-			{#if searchQuery !== undefined}
-				<div class="flex-1 max-w-xl">
-					<div class="relative">
-						<input
-							type="text"
-							bind:value={searchQuery}
-							placeholder={searchPlaceholder}
-							class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-						/>
-						<Search
-							class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"
-						/>
-					</div>
+		<div class="flex flex-col md:flex-row gap-4 md:items-center {createUrl || onCreate || (selectedCount > 0 && onBatchDelete) || actions ? 'md:justify-between' : ''}">
+			<!-- 左侧：按钮组 -->
+			{#if createUrl || onCreate || (selectedCount > 0 && onBatchDelete) || actions}
+				<div class="flex items-center gap-3">
+					{#if createUrl || onCreate}
+						<Button onclick={handleCreate}>
+							<Plus class="w-5 h-5 mr-2" />
+							{createText}
+						</Button>
+					{/if}
+
+					<!-- 批量操作 -->
+					{#if selectedCount > 0 && onBatchDelete}
+						<Button variant="outline" onclick={onBatchDelete} class="text-red-600 border-red-300">
+							删除选中 ({selectedCount})
+						</Button>
+					{/if}
+
+					{#if actions}
+						{@render actions()}
+					{/if}
 				</div>
 			{/if}
 
-			{#if filters}
-				{@render filters()}
-			{/if}
+			<!-- 右侧：搜索框和筛选器 -->
+			<div class="flex flex-col md:flex-row gap-4 md:items-center">
+				{#if filters}
+					{@render filters()}
+				{/if}
 
-			<!-- 批量操作 -->
-			{#if selectedCount > 0 && onBatchDelete}
-				<Button variant="outline" onclick={onBatchDelete} class="text-red-600 border-red-300">
-					删除选中 ({selectedCount})
-				</Button>
-			{/if}
-
-			{#if actions}
-				{@render actions()}
-			{/if}
+				<!-- 搜索框 -->
+				{#if searchQuery !== undefined}
+					<div class="w-full md:w-auto md:max-w-2xl relative">
+						<Input
+							bind:value={searchQuery}
+							placeholder={searchPlaceholder}
+							class="pl-10"
+						/>
+						<Search
+							class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
+						/>
+					</div>
+				{/if}
+			</div>
 		</div>
 	</div>
 

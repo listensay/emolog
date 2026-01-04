@@ -182,27 +182,22 @@
 					<h3 class="text-lg font-semibold text-slate-900 mb-4">基本资料</h3>
 
 					<div class="space-y-4">
-						<div>
-							<label class="block text-sm font-medium text-slate-700 mb-1">用户名</label>
-							<input
-								type="text"
-								value={user.username}
-								disabled
-								class="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed"
-							/>
-							<p class="text-xs text-slate-400 mt-1">用户名不可修改</p>
-						</div>
+						<Input
+							label="用户名"
+							value={user.username}
+							disabled
+							class="bg-slate-50 text-slate-500 cursor-not-allowed"
+						/>
+						<p class="text-xs text-slate-400 -mt-3">用户名不可修改</p>
 
-						<div>
-							<label class="block text-sm font-medium text-slate-700 mb-1">邮箱</label>
-							<input
-								type="email"
-								value={user.email}
-								disabled
-								class="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed"
-							/>
-							<p class="text-xs text-slate-400 mt-1">邮箱不可修改</p>
-						</div>
+						<Input
+							label="邮箱"
+							type="email"
+							value={user.email}
+							disabled
+							class="bg-slate-50 text-slate-500 cursor-not-allowed"
+						/>
+						<p class="text-xs text-slate-400 -mt-3">邮箱不可修改</p>
 
 						<Input
 							label="昵称"
