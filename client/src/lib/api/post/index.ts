@@ -63,7 +63,7 @@ export const getPostList = (
 	pageSize = 10
 ): Promise<PaginationResponse<Post>> => {
 	return request.get<PaginationResponse<Post>>('/post', {
-		params: { page, pageSize }
+		params: { page, pageSize, type: 0 }
 	});
 };
 

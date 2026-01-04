@@ -17,6 +17,8 @@
 		onSubmit: () => void;
 		onCancel: () => void;
 		isSubmitting?: boolean;
+		isPage?: boolean; // 是否为页面模式
+		pageTypeOptions?: Array<{ value: string; label: string }>; // 页面类型选项
 		// Bindable values
 		title: string;
 		description: string;
@@ -24,6 +26,7 @@
 		categoryId: string;
 		coverImage: string;
 		selectedTagIds: number[];
+		pageType?: string; // 页面类型
 	}
 
 	let {
@@ -34,21 +37,48 @@
 		onSubmit,
 		onCancel,
 		isSubmitting = false,
+		isPage = false,
+		pageTypeOptions = [],
 		title = $bindable(''),
 		description = $bindable(''),
 		content = $bindable(''),
 		categoryId = $bindable(''),
 		coverImage = $bindable(''),
-		selectedTagIds = $bindable([])
+		selectedTagIds = $bindable([]),
+		pageType = $bindable('')
 	}: Props = $props();
 
 	let newTagName = $state('');
 	let isCreatingTag = $state(false);
 	let showImagePicker = $state(false);
 
-	const pageTitle = $derived(mode === 'create' ? '新建文章' : '编辑文章');
-	const pageSubtitle = $derived(mode === 'create' ? '创建一篇新的文章' : '编辑你的文章');
-	const submitButtonText = $derived(mode === 'create' ? '发布文章' : '更新文章');
+	const pageTitle = $derived(
+		isPage
+			? mode === 'create'
+				? '新建页面'
+				: '编辑页面'
+			: mode === 'create'
+				? '新建文章'
+				: '编辑文章'
+	);
+	const pageSubtitle = $derived(
+		isPage
+			? mode === 'create'
+				? '创建一个新的页面'
+				: '编辑你的页面'
+			: mode === 'create'
+				? '创建一篇新的文章'
+				: '编辑你的文章'
+	);
+	const submitButtonText = $derived(
+		isPage
+			? mode === 'create'
+				? '发布页面'
+				: '更新页面'
+			: mode === 'create'
+				? '发布文章'
+				: '更新文章'
+	);
 
 	function toggleTag(tagId: number) {
 		if (selectedTagIds.includes(tagId)) {
@@ -199,6 +229,25 @@
 						</Button>
 					</div>
 				</div>
+
+				<!-- 页面类型选择（仅页面模式） -->
+				{#if isPage && pageTypeOptions.length > 0}
+					<div>
+						<label for="pageType" class="block text-sm font-medium text-slate-700 mb-2">
+							页面类型 <span class="text-red-500">*</span>
+						</label>
+						<select
+							id="pageType"
+							bind:value={pageType}
+							class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+						>
+							{#each pageTypeOptions as option}
+								<option value={option.value}>{option.label}</option>
+							{/each}
+						</select>
+						<p class="text-xs text-slate-500 mt-1">选择页面的类型，不同类型的页面可以有不同的展示方式</p>
+					</div>
+				{/if}
 
 				<div class="pt-4 border-t border-slate-200 space-y-2">
 					<Button type="button" onclick={onSubmit} loading={isSubmitting} class="w-full">

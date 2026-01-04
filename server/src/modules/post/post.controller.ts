@@ -79,11 +79,18 @@ export class PostController {
     description: '每页数量',
     example: 10,
   })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    description: '文章类型（0=文章，1=页面）',
+    example: 0,
+  })
   async findAll(
     @Query('page') page?: number,
     @Query('pageSize') pageSize?: number,
+    @Query('type') type?: number,
   ) {
-    return await this.postService.findAll(page, pageSize);
+    return await this.postService.findAll(page, pageSize, type);
   }
 
   /**

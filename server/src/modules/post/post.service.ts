@@ -48,9 +48,16 @@ export class PostService {
   /**
    * 获取所有文章（分页）
    */
-  async findAll(page = 1, pageSize = 10, isDeleted = false) {
+  async findAll(page = 1, pageSize = 10, type?: number) {
+    const whereCondition: any = { isDeleted: false };
+
+    // 如果指定了 type，则添加到查询条件
+    if (type !== undefined && type !== null) {
+      whereCondition.type = type;
+    }
+
     const [list, total] = await this.postRepository.findAndCount({
-      where: { isDeleted },
+      where: whereCondition,
       skip: (page - 1) * pageSize,
       take: pageSize,
       order: { createdAt: 'DESC' },

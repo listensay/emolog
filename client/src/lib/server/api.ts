@@ -54,7 +54,7 @@ export async function getPostSSR(id: number) {
  */
 export async function getPostListSSR(page = 1, pageSize = 10) {
 	return serverFetch<{ data: { list: any[]; total: number; page: number; pageSize: number }; success: boolean }>(
-		`/post?page=${page}&pageSize=${pageSize}`
+		`/post?page=${page}&pageSize=${pageSize}&type=0`
 	);
 }
 

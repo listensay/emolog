@@ -35,6 +35,10 @@ export class CreatePostDto {
   @IsOptional()
   type?: number;
 
+  @IsString()
+  @IsOptional()
+  pageType?: string;
+
   @IsArray()
   @IsOptional()
   tagIds?: number[];

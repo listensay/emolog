@@ -56,6 +56,9 @@ export class Post {
   @Column({ default: 0 })
   type: number;
 
+  @Column({ length: 50, nullable: true })
+  pageType: string;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'authorId' })
   author: User;
