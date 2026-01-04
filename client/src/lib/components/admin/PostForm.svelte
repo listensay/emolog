@@ -89,11 +89,7 @@
 
 <div class="max-w-5xl mx-auto space-y-6">
 	<!-- 页面标题 -->
-	<div class="flex items-center justify-between">
-		<div>
-			<h1 class="text-2xl font-bold text-slate-900">{pageTitle}</h1>
-			<p class="text-sm text-slate-500 mt-1">{pageSubtitle}</p>
-		</div>
+	<div>
 		<Button variant="ghost" onclick={onCancel}>
 			<ArrowLeft class="w-5 h-5 mr-2" />
 			返回

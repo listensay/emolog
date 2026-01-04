@@ -86,12 +86,7 @@
 	</div>
 {:else if category}
 	<div class="max-w-2xl mx-auto space-y-6">
-		<!-- 页面标题 -->
-		<div class="flex items-center justify-between">
-			<div>
-				<h1 class="text-2xl font-bold text-slate-900">编辑分类</h1>
-				<p class="text-sm text-slate-500 mt-1">编辑分类信息</p>
-			</div>
+		<div>
 			<Button variant="ghost" onclick={handleCancel}>
 				<ArrowLeft class="w-5 h-5 mr-2" />
 				返回

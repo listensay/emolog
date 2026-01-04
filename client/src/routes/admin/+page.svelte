@@ -8,8 +8,6 @@
 	import { getUserList } from '$lib/api/user';
 	import type { Post } from '$lib/api/post';
 
-	const authState = $derived($auth);
-
 	let stats = $state([
 		{ label: '总文章', value: '0', icon: FileText, color: 'bg-blue-500', trend: '-' },
 		{ label: '总访问量', value: '-', icon: Eye, color: 'bg-green-500', trend: '-' },
@@ -61,18 +59,6 @@
 </script>
 
 <div class="space-y-6">
-	<!-- 欢迎卡片 -->
-	{#if authState.user}
-		<div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl p-6 text-white">
-			<h2 class="text-2xl font-bold mb-2">
-				欢迎回来, {authState.user.username}! 👋
-			</h2>
-			<p class="text-emerald-100">
-				今天是个美好的一天,让我们开始工作吧!
-			</p>
-		</div>
-	{/if}
-
 	<!-- 统计卡片 -->
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 		{#each stats as stat}
