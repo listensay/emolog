@@ -4,7 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { toast } from '$lib/stores/toast';
 	import Button from '$lib/components/ui/Button.svelte';
-	import { Bell, LogOut } from '@lucide/svelte';
+	import { Bell, LogOut, Home } from '@lucide/svelte';
 
 	const authState = $derived($auth);
 
@@ -12,6 +12,10 @@
 		auth.logout();
 		toast.info('已退出登录');
 		goto('/auth/login');
+	}
+
+	function openHomePage() {
+		window.open('/', '_blank');
 	}
 </script>
 
@@ -32,6 +36,16 @@
 
 			<!-- 右侧：用户信息 -->
 			<div class="flex items-center gap-4">
+				<!-- 首页图标按钮 -->
+				<Button
+					variant="ghost"
+					onclick={openHomePage}
+					class="text-slate-600 hover:text-emerald-600"
+					title="访问网站首页"
+				>
+					<Home class="w-5 h-5" />
+				</Button>
+
 				<!-- 用户信息 (xl屏幕下隐藏，显示在右侧栏) -->
 				<div class="flex items-center gap-4 xl:hidden">
 					{#if authState.user}
