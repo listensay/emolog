@@ -32,44 +32,37 @@
 
 			<!-- 右侧：用户信息 -->
 			<div class="flex items-center gap-4">
-				<!-- 通知 -->
-				<button
-					class="relative p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors"
-					title="通知"
-				>
-					<Bell class="w-6 h-6" />
-					<span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-				</button>
-
-				<!-- 用户信息 -->
-				{#if authState.user}
-					<a href="/admin/profile" class="flex items-center gap-3 pl-4 border-l border-slate-200 hover:opacity-80 transition-opacity">
-						<div class="text-right">
-							<p class="text-sm font-medium text-slate-900">
-								{authState.user.nickname || authState.user.username}
-							</p>
-							<p class="text-xs text-slate-500">
-								{authState.user.email}
-							</p>
-						</div>
-						{#if authState.user.avatar}
-							<img
-								src={authState.user.avatar}
-								alt={authState.user.username}
-								class="w-10 h-10 rounded-full object-cover"
-							/>
-						{:else}
-							<div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
-								{authState.user.username.charAt(0).toUpperCase()}
+				<!-- 用户信息 (xl屏幕下隐藏，显示在右侧栏) -->
+				<div class="flex items-center gap-4 xl:hidden">
+					{#if authState.user}
+						<a href="/admin/profile" class="flex items-center gap-3 pl-4 border-l border-slate-200 hover:opacity-80 transition-opacity">
+							<div class="text-right">
+								<p class="text-sm font-medium text-slate-900">
+									{authState.user.nickname || authState.user.username}
+								</p>
+								<p class="text-xs text-slate-500">
+									{authState.user.email}
+								</p>
 							</div>
-						{/if}
-					</a>
-				{/if}
+							{#if authState.user.avatar}
+								<img
+									src={authState.user.avatar}
+									alt={authState.user.username}
+									class="w-10 h-10 rounded-full object-cover"
+								/>
+							{:else}
+								<div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
+									{authState.user.username.charAt(0).toUpperCase()}
+								</div>
+							{/if}
+						</a>
+					{/if}
 
-				<!-- 退出按钮 -->
-				<Button variant="ghost" onclick={handleLogout} class="text-slate-600">
-					<LogOut class="w-5 h-5" />
-				</Button>
+					<!-- 退出按钮 -->
+					<Button variant="ghost" onclick={handleLogout} class="text-slate-600">
+						<LogOut class="w-5 h-5" />
+					</Button>
+				</div>
 			</div>
 		</div>
 	</div>

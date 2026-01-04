@@ -87,8 +87,7 @@
 	}
 </script>
 
-<div class="max-w-5xl mx-auto space-y-6">
-	<!-- 页面标题 -->
+<div class="space-y-6">
 	<div>
 		<Button variant="ghost" onclick={onCancel}>
 			<ArrowLeft class="w-5 h-5 mr-2" />
@@ -282,22 +281,10 @@
 			<!-- 文章统计 -->
 			<div class="bg-white rounded-xl border border-slate-200 p-6 space-y-4">
 				<h3 class="text-lg font-semibold text-slate-900">文章统计</h3>
-
 				<div class="space-y-2 text-sm">
 					<div class="flex justify-between">
 						<span class="text-slate-600">字数</span>
 						<span class="font-medium">{content.replace(/<[^>]*>/g, '').length}</span>
-					</div>
-					<div class="flex justify-between">
-						<span class="text-slate-600">预计阅读</span>
-						<span class="font-medium">
-							{Math.ceil(content.replace(/<[^>]*>/g, '').length / 500)}
-							分钟
-						</span>
-					</div>
-					<div class="flex justify-between">
-						<span class="text-slate-600">HTML字节</span>
-						<span class="font-medium">{content.length}</span>
 					</div>
 				</div>
 			</div>
