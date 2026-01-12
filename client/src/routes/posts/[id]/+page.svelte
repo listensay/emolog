@@ -3,8 +3,14 @@
 	import { incrementPostViews, incrementPostLikes } from '$lib/api/post';
 	import type { Post } from '$lib/api/post';
 	import type { SiteConfig } from '$lib/api/config';
+	import { getCommentsByPost, createComment, type Comment } from '$lib/api/comment';
 	import HomeLayout from '$lib/components/layout/HomeLayout.svelte';
-	import { Calendar, Clock, Eye, Heart } from '@lucide/svelte';
+	import CommentList from '$lib/components/CommentList.svelte';
+	import CommentForm from '$lib/components/CommentForm.svelte';
+	import { Calendar, Clock, Eye, Heart, MessageCircle } from '@lucide/svelte';
+	import { toast } from '$lib/stores/toast';
+	import { auth } from '$lib/stores/auth';
+	import { onMount } from 'svelte';
 
 	interface Props {
 		data: {
@@ -18,6 +24,12 @@
 	let post: Post = $state(data.post);
 	let isLiking = $state(false);
 	let hasLiked = $state(false);
+	let comments: Comment[] = $state([]);
+	let commentTotal = $state(0);
+	let isLoadingComments = $state(false);
+	let isSubmittingComment = $state(false);
+	let replyToComment: Comment | null = $state(null);
+	let showTopCommentForm = $state(true);
 
 	// 客户端初始化
 	$effect(() => {
@@ -29,6 +41,24 @@
 			hasLiked = likedPosts.includes(post.id);
 		}
 	});
+
+	onMount(async () => {
+		await loadComments();
+	});
+
+	async function loadComments() {
+		isLoadingComments = true;
+		try {
+			const response = await getCommentsByPost(post.id, 1, 100);
+			comments = response.data.list;
+			commentTotal = response.data.total;
+		} catch (err) {
+			console.error('加载评论失败:', err);
+			toast.error('加载评论失败');
+		} finally {
+			isLoadingComments = false;
+		}
+	}
 
 	async function handleLike() {
 		if (isLiking || hasLiked || !post) return;
@@ -46,6 +76,43 @@
 		} finally {
 			isLiking = false;
 		}
+	}
+
+	async function handleCommentSubmit(data: {
+		username?: string;
+		email?: string;
+		url?: string;
+		content: string;
+		parentCommentId?: number;
+	}) {
+		isSubmittingComment = true;
+		try {
+			await createComment({
+				...data,
+				postId: post.id,
+				userId: $auth.user?.id
+			});
+			toast.success('评论发表成功');
+			replyToComment = null;
+			showTopCommentForm = true;
+			await loadComments();
+		} catch (err: any) {
+			toast.error(err.message || '评论发表失败');
+			throw err;
+		} finally {
+			isSubmittingComment = false;
+		}
+	}
+
+	function handleReply(comment: Comment) {
+		replyToComment = comment;
+		showTopCommentForm = false;
+		// 不需要滚动，表单会出现在评论下方
+	}
+
+	function handleCancelReply() {
+		replyToComment = null;
+		showTopCommentForm = true;
 	}
 
 	function formatDate(date: string) {
@@ -150,6 +217,16 @@
 					<span>{hasLiked ? '已点赞' : '点赞'}</span>
 					<span class="text-sm">({post.likes})</span>
 				</button>
+
+				<!-- 评论数 -->
+				<a
+					href="#comments"
+					class="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 transition-all"
+				>
+					<MessageCircle class="w-5 h-5" />
+					<span>评论</span>
+					<span class="text-sm">({commentTotal})</span>
+				</a>
 			</div>
 
 			<!-- 更新时间 -->
@@ -159,6 +236,41 @@
 				</span>
 			{/if}
 		</div>
+
+		<!-- 评论区 -->
+		<section id="comments" class="mt-12">
+			<h2 class="text-2xl font-bold text-slate-900 mb-6">
+				评论 ({commentTotal})
+			</h2>
+
+			<!-- 顶部评论表单（仅在不回复时显示） -->
+			{#if showTopCommentForm}
+				<div id="comment-form" class="mb-8">
+					<CommentForm
+						postId={post.id}
+						replyTo={null}
+						onSubmit={handleCommentSubmit}
+						isSubmitting={isSubmittingComment}
+					/>
+				</div>
+			{/if}
+
+			<!-- 评论列表 -->
+			{#if isLoadingComments}
+				<div class="text-center py-12 text-slate-400">
+					<p>加载评论中...</p>
+				</div>
+			{:else}
+				<CommentList
+					comments={comments}
+					onReply={handleReply}
+					replyToComment={replyToComment}
+					onSubmitReply={handleCommentSubmit}
+					onCancelReply={handleCancelReply}
+					isSubmitting={isSubmittingComment}
+				/>
+			{/if}
+		</section>
 
 	</article>
 </HomeLayout>
