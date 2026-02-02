@@ -168,14 +168,6 @@
 
 		<!-- 提交按钮 -->
 		<div class="flex items-center justify-between">
-			<p class="text-xs text-slate-500">
-				{#if !isLoggedIn}
-					评论前请先填写昵称和邮箱，或
-					<a href="/auth/login" class="text-emerald-600 hover:underline">登录</a>
-				{:else}
-					您的评论将以注册用户身份发布
-				{/if}
-			</p>
 			<div class="flex gap-2">
 				{#if replyTo && onCancel}
 					<Button variant="outline" onclick={onCancel} type="button">
