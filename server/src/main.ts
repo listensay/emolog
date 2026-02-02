@@ -28,23 +28,24 @@ async function bootstrap() {
   // 全局异常过滤器
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  // 创建 Swagger 文档配置
-  const config = new DocumentBuilder()
-    .setTitle('API 文档')
-    .setDescription('NestJS 项目的 Swagger API 文档')
-    .setVersion('1.0')
-    .addBearerAuth() // 添加 JWT 认证
-    .build();
+  // 仅在非生产环境启用 Swagger
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('API 文档')
+      .setDescription('NestJS 项目的 Swagger API 文档')
+      .setVersion('1.0')
+      .addBearerAuth() // 添加 JWT 认证
+      .build();
 
-  // 生成文档
-  const document = SwaggerModule.createDocument(app, config);
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api', app, document);
+  }
 
-  // 挂载 Swagger UI
-  SwaggerModule.setup('api', app, document);
-
-  await app.listen(process.env.PORT ?? 8080, '0.0.0.0');
+  await app.listen(process.env.PORT ?? 8088, '0.0.0.0');
   console.log(`Application is running on: ${await app.getUrl()}`);
-  console.log(`Swagger UI is running on: ${await app.getUrl()}/api`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`Swagger UI is running on: ${await app.getUrl()}/api`);
+  }
 }
 
 bootstrap();
