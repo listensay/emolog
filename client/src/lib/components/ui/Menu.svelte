@@ -9,9 +9,9 @@
 
 	const menuItems: MenuItem[] = [
 		{ label: '首页', href: '/' },
-		{ label: '归档', href: '/archives' },
-		{ label: '关于', href: '/about', },
-		{ label: '朋友', href: '/links', }
+		// { label: '归档', href: '/archives' },
+		// { label: '关于', href: '/about', },
+		// { label: '朋友', href: '/links', }
 	];
 
 	const currentPath = $derived($page.url.pathname);
