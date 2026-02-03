@@ -1,0 +1,100 @@
+<script lang="ts">
+import Input from '$lib/components/ui/Input.svelte';
+import Button from '$lib/components/ui/Button.svelte';
+import Form from '$lib/components/ui/Form.svelte';
+import { login } from '$lib/api/auth';
+import { goto } from '$app/navigation';
+import { toast } from '$lib/stores/toast';
+import { auth } from '$lib/stores/auth';
+
+let email = $state('');
+let password = $state('');
+let isLoading = $state(false);
+
+async function handleSubmit() {
+    // 表单验证
+    if (!email || !password) {
+        toast.warning('请输入用户名和密码');
+        return;
+    }
+
+    isLoading = true;
+
+    try {
+        const response = await login({
+            usernameOrEmail: email,
+            password
+        });
+
+        // 使用 auth store 保存登录状态
+        if (response.data?.access_token && response.data?.user) {
+            auth.login(response.data.access_token, response.data.user);
+        }
+
+        console.log('登录成功:', response);
+
+        toast.success('登录成功!');
+
+        // 跳转到首页或管理页面
+        goto('/admin');
+    } catch (error: any) {
+        console.error('登录失败:', error);
+        toast.error(error.message || '登录失败，请检查用户名和密码');
+    } finally {
+        isLoading = false;
+    }
+}
+</script>
+
+<div class="flex min-h-[80vh] items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+	<div class="w-full max-w-md space-y-8 bg-white p-8 border border-slate-200">
+		<div class="text-center">
+			<h2 class="mt-2 text-3xl font-bold tracking-tight text-slate-900">
+				欢迎回来 👏
+			</h2>
+			<p class="mt-2 text-sm text-slate-600">
+                请输入您的账号密码后点击登录，即可开始使用工作台！
+			</p>
+		</div>
+
+		<Form onsubmit={handleSubmit}>
+			<div class="space-y-4">
+				<Input
+					id="email"
+					label="用户名或邮箱"
+					type="email"
+					placeholder="you@example.com"
+					bind:value={email}
+					required
+					autocomplete="email"
+				/>
+
+				<div class="space-y-1">
+					<Input
+						id="password"
+						label="密码"
+						type="password"
+						placeholder="••••••••"
+						bind:value={password}
+						required
+						autocomplete="current-password"
+					/>
+				</div>
+			</div>
+
+			<Button type="submit" class="w-full" loading={isLoading}>
+				登录
+			</Button>
+		</Form>
+
+		<div class="text-center text-sm">
+			<span class="text-slate-600">没有账号？</span>
+			<a
+				href="/auth/register"
+				class="font-medium text-indigo-600 hover:text-indigo-500 ml-1"
+			>
+				立即注册
+			</a>
+		</div>
+	</div>
+</div>
