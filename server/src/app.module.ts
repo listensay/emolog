@@ -22,9 +22,14 @@ import { Config } from './modules/config/entities/config.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      // 根据 NODE_ENV 加载对应的环境变量文件
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
-      isGlobal: true, // 使配置在整个应用中可用
+      // dev 加载 .env.development，prod 加载 .env.production，其他加载 .env
+      envFilePath:
+        process.env.NODE_ENV === 'development'
+          ? '.env.development'
+          : process.env.NODE_ENV === 'production'
+            ? '.env.production'
+            : '.env',
+      isGlobal: true,
     }),
     // 静态文件服务，用于图片访问
     ServeStaticModule.forRoot({
