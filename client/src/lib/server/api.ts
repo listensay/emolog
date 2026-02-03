@@ -5,8 +5,8 @@ import { env } from '$env/dynamic/private';
  * SSR 时直接访问后端服务器
  */
 const getServerApiUrl = () => {
-	// 优先使用私有环境变量
-	return env.VITE_SERVER_URL;
+	// 使用 SERVER_URL 环境变量（运行时设置）
+	return env.SERVER_URL || 'http://127.0.0.1:8088';
 };
 
 /**
