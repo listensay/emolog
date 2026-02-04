@@ -72,7 +72,7 @@
 			await updatePost(post.id, {
 				title: title.trim(),
 				content,
-				cover: coverImage || undefined,
+				cover: coverImage || null,
 				description: description.trim() || undefined,
 				categoryId: parseInt(categoryId) || 1,
 				tagIds: selectedTagIds
