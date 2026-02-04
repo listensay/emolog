@@ -161,4 +161,25 @@ export class UserService {
     }
     return await this.userRepository.save(user);
   }
+
+  /**
+   * 获取博主公开资料（最近活跃的用户）
+   */
+  async getOwnerProfile(): Promise<Partial<User> | null> {
+    const user = await this.userRepository.findOne({
+      where: { isActive: true },
+      order: { updatedAt: 'DESC' },
+    });
+    if (!user) {
+      return null;
+    }
+    // 只返回公开信息
+    return {
+      id: user.id,
+      nickname: user.nickname,
+      avatar: user.avatar,
+      profileBackground: user.profileBackground,
+      links: user.links,
+    };
+  }
 }
