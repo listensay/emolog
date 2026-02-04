@@ -6,7 +6,7 @@ import { env } from '$env/dynamic/private';
  */
 const getServerApiUrl = () => {
 	// 使用 SERVER_URL 环境变量（运行时设置）
-	return env.SERVER_URL || 'http://127.0.0.1:8088';
+	return env.SERVER_URL;
 };
 
 /**
