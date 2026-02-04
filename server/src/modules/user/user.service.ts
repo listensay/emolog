@@ -139,7 +139,12 @@ export class UserService {
    */
   async updateProfile(
     id: number,
-    updateData: { nickname?: string; avatar?: string },
+    updateData: {
+      nickname?: string;
+      avatar?: string;
+      profileBackground?: string;
+      links?: Array<{ order: number; icon: string; name: string; url: string }>;
+    },
   ): Promise<User> {
     const user = await this.findOne(id);
     if (updateData.nickname !== undefined) {
@@ -147,6 +152,12 @@ export class UserService {
     }
     if (updateData.avatar !== undefined) {
       user.avatar = updateData.avatar;
+    }
+    if (updateData.profileBackground !== undefined) {
+      user.profileBackground = updateData.profileBackground;
+    }
+    if (updateData.links !== undefined) {
+      user.links = updateData.links;
     }
     return await this.userRepository.save(user);
   }

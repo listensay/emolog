@@ -5,8 +5,9 @@
 	import { toast } from '$lib/stores/toast';
 	import { auth } from '$lib/stores/auth';
 	import { getCurrentUser, updateProfile, changePassword } from '$lib/api/user';
-	import type { User } from '$lib/api/user';
+	import type { User, UserLink } from '$lib/api/user';
 	import { onMount } from 'svelte';
+	import { Plus, Trash2, GripVertical, Pencil } from '@lucide/svelte';
 
 	let user: User | null = $state(null);
 	let isLoading = $state(true);
@@ -16,9 +17,20 @@
 	// 基本资料表单
 	let nickname = $state('');
 	let avatar = $state('');
+	let profileBackground = $state('');
+
+	// Links 管理
+	let links = $state<UserLink[]>([]);
+	let isAddingLink = $state(false);
+	let newLink = $state<UserLink>({ order: 0, icon: '', name: '', url: '' });
+	let editingLinkIndex = $state<number | null>(null);
+	let editingLink = $state<UserLink>({ order: 0, icon: '', name: '', url: '' });
 
 	// 图片选择器状态
-	let imagePickerOpen = $state(false);
+	let avatarPickerOpen = $state(false);
+	let backgroundPickerOpen = $state(false);
+	let linkIconPickerOpen = $state(false);
+	let editLinkIconPickerOpen = $state(false);
 
 	// 修改密码表单
 	let currentPassword = $state('');
@@ -40,6 +52,8 @@
 			user = response.data;
 			nickname = user.nickname || '';
 			avatar = user.avatar || '';
+			profileBackground = user.profileBackground || '';
+			links = user.links || [];
 		} catch (error) {
 			toast.error('加载用户资料失败');
 			console.error(error);
@@ -53,13 +67,18 @@
 
 		isSavingProfile = true;
 		try {
-			const response = await updateProfile({ nickname, avatar: avatar || undefined });
+			const response = await updateProfile({
+				nickname,
+				avatar: avatar || undefined,
+				profileBackground: profileBackground || undefined,
+				links: links.length > 0 ? links : undefined
+			});
 			user = response.data;
 
 			// 更新 auth store 中的用户信息
 			auth.updateUser({
-				nickname: user.nickname,
-				avatar: user.avatar
+				nickname: user.nickname ?? undefined,
+				avatar: user.avatar ?? undefined
 			});
 
 			toast.success('资料更新成功');
@@ -111,14 +130,77 @@
 		}
 	}
 
-	function formatDate(date: string) {
-		return new Date(date).toLocaleDateString('zh-CN', {
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit'
-		});
+	async function saveLinks() {
+		try {
+			await updateProfile({
+				nickname,
+				avatar: avatar || undefined,
+				profileBackground: profileBackground || undefined,
+				links: links.length > 0 ? links : undefined
+			});
+			toast.success('链接已保存');
+		} catch (error: any) {
+			toast.error(error.message || '保存链接失败');
+		}
+	}
+
+	function startAddLink() {
+		isAddingLink = true;
+		newLink = { order: links.length + 1, icon: '', name: '', url: '' };
+	}
+
+	async function confirmAddLink() {
+		if (!newLink.name.trim()) {
+			toast.warning('请输入链接名称');
+			return;
+		}
+		if (!newLink.url.trim()) {
+			toast.warning('请输入链接地址');
+			return;
+		}
+
+		links = [...links, { ...newLink }];
+		isAddingLink = false;
+		newLink = { order: 0, icon: '', name: '', url: '' };
+		await saveLinks();
+	}
+
+	function cancelAddLink() {
+		isAddingLink = false;
+		newLink = { order: 0, icon: '', name: '', url: '' };
+	}
+
+	async function removeLink(index: number) {
+		links = links.filter((_, i) => i !== index);
+		// 重新排序
+		links = links.map((link, i) => ({ ...link, order: i + 1 }));
+		await saveLinks();
+	}
+
+	function startEditLink(index: number) {
+		editingLinkIndex = index;
+		editingLink = { ...links[index] };
+	}
+
+	async function saveEditLink() {
+		if (editingLinkIndex === null) return;
+		if (!editingLink.name.trim()) {
+			toast.warning('请输入链接名称');
+			return;
+		}
+		if (!editingLink.url.trim()) {
+			toast.warning('请输入链接地址');
+			return;
+		}
+		links = links.map((link, i) => i === editingLinkIndex ? { ...editingLink } : link);
+		editingLinkIndex = null;
+		editingLink = { order: 0, icon: '', name: '', url: '' };
+		await saveLinks();
+	}
+
+	function cancelEditLink() {
+		editingLinkIndex = null;
+		editingLink = { order: 0, icon: '', name: '', url: '' };
 	}
 </script>
 
@@ -126,57 +208,13 @@
 	{#if isLoading}
 		<div class="bg-white rounded-xl border border-slate-200 p-8">
 			<div class="animate-pulse space-y-4">
-				<div class="h-20 w-20 bg-slate-200 rounded-full mx-auto"></div>
-				<div class="h-4 bg-slate-200 rounded w-1/3 mx-auto"></div>
-				<div class="h-4 bg-slate-200 rounded w-1/4 mx-auto"></div>
+				<div class="h-4 bg-slate-200 rounded w-1/3"></div>
+				<div class="h-10 bg-slate-200 rounded"></div>
+				<div class="h-4 bg-slate-200 rounded w-1/4"></div>
 			</div>
 		</div>
 	{:else if user}
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-			<!-- 左侧：用户信息卡片 -->
-			<div class="lg:col-span-1">
-				<div class="bg-white rounded-xl border border-slate-200 p-6">
-					<div class="text-center">
-						<!-- 头像 -->
-						{#if user.avatar}
-							<img
-								src={user.avatar}
-								alt={user.username}
-								class="w-24 h-24 rounded-full object-cover mx-auto mb-4"
-							/>
-						{:else}
-							<div class="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-4">
-								{user.username.charAt(0).toUpperCase()}
-							</div>
-						{/if}
-
-						<!-- 用户名 -->
-						<h2 class="text-xl font-bold text-slate-900">{user.username}</h2>
-						{#if user.nickname}
-							<p class="text-slate-500">{user.nickname}</p>
-						{/if}
-
-						<!-- 邮箱 -->
-						<p class="text-sm text-slate-400 mt-2">{user.email}</p>
-
-						<!-- 状态 -->
-						<div class="mt-4">
-							<span class="px-3 py-1 text-xs rounded-full {user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-								{user.isActive ? '正常' : '已禁用'}
-							</span>
-						</div>
-
-						<!-- 注册时间 -->
-						<div class="mt-4 pt-4 border-t border-slate-200">
-							<p class="text-xs text-slate-400">注册于</p>
-							<p class="text-sm text-slate-600">{formatDate(user.createdAt)}</p>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<!-- 右侧：设置表单 -->
-			<div class="lg:col-span-2 space-y-6">
+		<div class="space-y-6">
 				<!-- 基本资料 -->
 				<div class="bg-white rounded-xl border border-slate-200 p-6">
 					<h3 class="text-lg font-semibold text-slate-900 mb-4">基本资料</h3>
@@ -210,7 +248,6 @@
 						<div>
 							<label class="block text-sm font-medium text-slate-700 mb-2">头像</label>
 							<div class="flex items-center gap-4">
-								<!-- 头像预览 -->
 								{#if avatar}
 									<img
 										src={avatar}
@@ -223,7 +260,7 @@
 									</div>
 								{/if}
 								<div class="flex flex-col gap-2">
-									<Button variant="outline" onclick={() => imagePickerOpen = true}>
+									<Button variant="outline" onclick={() => avatarPickerOpen = true}>
 										选择图片
 									</Button>
 									{#if avatar}
@@ -239,6 +276,40 @@
 							</div>
 						</div>
 
+						<!-- 背景图选择 -->
+						<div>
+							<label class="block text-sm font-medium text-slate-700 mb-2">个人资料背景图</label>
+							<div class="space-y-3">
+								{#if profileBackground}
+									<div class="relative w-full h-32 rounded-lg overflow-hidden border border-slate-200">
+										<img
+											src={profileBackground}
+											alt="背景图预览"
+											class="w-full h-full object-cover"
+										/>
+									</div>
+								{:else}
+									<div class="w-full h-32 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white">
+										<span class="text-sm">默认渐变背景</span>
+									</div>
+								{/if}
+								<div class="flex gap-2">
+									<Button variant="outline" onclick={() => backgroundPickerOpen = true}>
+										选择背景图
+									</Button>
+									{#if profileBackground}
+										<button
+											type="button"
+											onclick={() => profileBackground = ''}
+											class="text-sm text-red-600 hover:text-red-700 px-3"
+										>
+											移除背景图
+										</button>
+									{/if}
+								</div>
+							</div>
+						</div>
+
 						<div class="pt-2">
 							<Button onclick={handleSaveProfile} loading={isSavingProfile}>
 								保存资料
@@ -246,6 +317,152 @@
 						</div>
 					</div>
 				</div>
+
+				<!-- Links 管理 -->
+				<div class="bg-white rounded-xl border border-slate-200 p-6">
+					<h3 class="text-lg font-semibold text-slate-900 mb-4">Links 管理</h3>
+
+					<!-- 添加按钮 -->
+					{#if !isAddingLink}
+						<Button variant="outline" onclick={startAddLink}>
+							<Plus class="w-4 h-4 mr-2" />
+							添加链接
+						</Button>
+					{/if}
+
+					<!-- 添加链接表单 -->
+					{#if isAddingLink}
+						<div class="border border-slate-200 rounded-lg p-4 mb-4 bg-slate-50">
+							<div class="grid grid-cols-12 gap-3 items-end">
+								<div class="col-span-1">
+									<label class="block text-xs font-medium text-slate-600 mb-1">序号</label>
+									<input
+										type="number"
+										bind:value={newLink.order}
+										placeholder="1"
+										class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+									/>
+								</div>
+								<div class="col-span-2">
+									<label class="block text-xs font-medium text-slate-600 mb-1">图标</label>
+									<div class="flex items-center gap-2">
+										{#if newLink.icon}
+											<img src={newLink.icon} alt="图标" class="w-8 h-8 rounded object-cover border border-slate-200" />
+										{:else}
+											<div class="w-8 h-8 rounded bg-slate-200 flex items-center justify-center text-slate-400 text-xs">无</div>
+										{/if}
+										<Button variant="outline" onclick={() => linkIconPickerOpen = true}>
+											选择
+										</Button>
+									</div>
+								</div>
+								<div class="col-span-3">
+									<label class="block text-xs font-medium text-slate-600 mb-1">名称</label>
+									<Input
+										bind:value={newLink.name}
+										placeholder="GitHub"
+									/>
+								</div>
+								<div class="col-span-4">
+									<label class="block text-xs font-medium text-slate-600 mb-1">链接</label>
+									<Input
+										bind:value={newLink.url}
+										placeholder="https://github.com/username"
+									/>
+								</div>
+								<div class="col-span-2 flex gap-2">
+									<Button onclick={confirmAddLink}>完成</Button>
+									<Button variant="outline" onclick={cancelAddLink}>取消</Button>
+								</div>
+							</div>
+						</div>
+					{/if}
+
+					<!-- Links 列表 -->
+					{#if links.length > 0}
+						<div class="mt-4 space-y-2">
+							{#each links as link, index (index)}
+								{#if editingLinkIndex === index}
+									<!-- 编辑模式 -->
+									<div class="border border-emerald-300 rounded-lg p-4 bg-emerald-50">
+										<div class="grid grid-cols-12 gap-3 items-end">
+											<div class="col-span-1">
+												<label class="block text-xs font-medium text-slate-600 mb-1">序号</label>
+												<input
+													type="number"
+													bind:value={editingLink.order}
+													placeholder="1"
+													class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+												/>
+											</div>
+											<div class="col-span-2">
+												<label class="block text-xs font-medium text-slate-600 mb-1">图标</label>
+												<div class="flex items-center gap-2">
+													{#if editingLink.icon}
+														<img src={editingLink.icon} alt="图标" class="w-8 h-8 rounded object-cover border border-slate-200" />
+													{:else}
+														<div class="w-8 h-8 rounded bg-slate-200 flex items-center justify-center text-slate-400 text-xs">无</div>
+													{/if}
+													<Button variant="outline" onclick={() => editLinkIconPickerOpen = true}>
+														选择
+													</Button>
+												</div>
+											</div>
+											<div class="col-span-3">
+												<label class="block text-xs font-medium text-slate-600 mb-1">名称</label>
+												<Input
+													bind:value={editingLink.name}
+													placeholder="GitHub"
+												/>
+											</div>
+											<div class="col-span-4">
+												<label class="block text-xs font-medium text-slate-600 mb-1">链接</label>
+												<Input
+													bind:value={editingLink.url}
+													placeholder="https://github.com/username"
+												/>
+											</div>
+											<div class="col-span-2 flex gap-2">
+												<Button onclick={saveEditLink}>保存</Button>
+												<Button variant="outline" onclick={cancelEditLink}>取消</Button>
+											</div>
+										</div>
+									</div>
+								{:else}
+									<!-- 显示模式 -->
+									<div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+										<GripVertical class="w-4 h-4 text-slate-400 cursor-move" />
+										<span class="w-8 text-center text-sm text-slate-500">{link.order}</span>
+										{#if link.icon}
+											<img src={link.icon} alt="图标" class="w-8 h-8 rounded object-cover border border-slate-200" />
+										{:else}
+											<div class="w-8 h-8 rounded bg-slate-200 flex items-center justify-center text-slate-400 text-xs">无</div>
+										{/if}
+										<span class="w-24 text-sm font-medium text-slate-900">{link.name}</span>
+										<span class="flex-1 text-sm text-slate-500 truncate" title={link.url}>{link.url}</span>
+										<button
+											type="button"
+											onclick={() => startEditLink(index)}
+											class="p-1 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded"
+										>
+											<Pencil class="w-4 h-4" />
+										</button>
+										<button
+											type="button"
+											onclick={() => removeLink(index)}
+											class="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
+										>
+											<Trash2 class="w-4 h-4" />
+										</button>
+									</div>
+								{/if}
+							{/each}
+						</div>
+					{:else if !isAddingLink}
+						<p class="mt-4 text-sm text-slate-500">暂无链接，点击上方按钮添加</p>
+					{/if}
+
+					</div>
 
 				<!-- 修改密码 -->
 				<div class="bg-white rounded-xl border border-slate-200 p-6">
@@ -284,14 +501,37 @@
 					</div>
 				</div>
 			</div>
-		</div>
 	{/if}
 </div>
 
-<!-- 图片选择器 -->
+<!-- 头像选择器 -->
 <ImagePicker
-	bind:open={imagePickerOpen}
-	onSelect={(url) => {
+	bind:open={avatarPickerOpen}
+	onSelect={(url: string) => {
 		avatar = url;
+	}}
+/>
+
+<!-- 背景图选择器 -->
+<ImagePicker
+	bind:open={backgroundPickerOpen}
+	onSelect={(url: string) => {
+		profileBackground = url;
+	}}
+/>
+
+<!-- 链接图标选择器 -->
+<ImagePicker
+	bind:open={linkIconPickerOpen}
+	onSelect={(url: string) => {
+		newLink.icon = url;
+	}}
+/>
+
+<!-- 编辑链接图标选择器 -->
+<ImagePicker
+	bind:open={editLinkIconPickerOpen}
+	onSelect={(url: string) => {
+		editingLink.icon = url;
 	}}
 />

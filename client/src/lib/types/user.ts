@@ -11,6 +11,8 @@ export interface User {
 	email: string;
 	nickname?: string;
 	avatar?: string;
+	profileBackground?: string;
+	links?: Array<{ order: number; icon: string; name: string; url: string }>;
 	isActive?: boolean;
 	createdAt?: string;
 	updatedAt?: string;
