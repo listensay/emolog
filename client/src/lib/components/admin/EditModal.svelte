@@ -10,6 +10,7 @@
 		placeholder?: string;
 		hint?: string;
 		required?: boolean;
+		disabled?: boolean;
 		options?: { value: any; label: string }[];
 		rows?: number;
 		min?: number;
@@ -102,6 +103,7 @@
 								id={field.name}
 								bind:value={formData[field.name]}
 								placeholder={field.placeholder || `请输入${field.label}...`}
+								disabled={field.disabled}
 							/>
 						{:else if field.type === 'number'}
 							<Input
@@ -110,6 +112,7 @@
 								bind:value={formData[field.name]}
 								min={field.min}
 								placeholder={field.placeholder || `请输入${field.label}...`}
+								disabled={field.disabled}
 							/>
 						{:else if field.type === 'textarea'}
 							<textarea
@@ -117,13 +120,15 @@
 								bind:value={formData[field.name]}
 								placeholder={field.placeholder || `请输入${field.label}...`}
 								rows={field.rows || 3}
-								class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+								disabled={field.disabled}
+								class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none disabled:bg-slate-100 disabled:text-slate-500"
 							></textarea>
 						{:else if field.type === 'select'}
 							<select
 								id={field.name}
 								bind:value={formData[field.name]}
-								class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+								disabled={field.disabled}
+								class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-slate-100 disabled:text-slate-500"
 							>
 								{#each field.options || [] as option (option.value)}
 									<option value={option.value}>{option.label}</option>
