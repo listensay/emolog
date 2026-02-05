@@ -61,9 +61,17 @@ export class PostService {
       skip: (page - 1) * pageSize,
       take: pageSize,
       order: { createdAt: 'DESC' },
-      relations: ['author', 'tags'],
+      relations: ['author', 'tags', 'comments'],
     });
-    return { list, total, page, pageSize };
+
+    // 添加评论数量并移除完整的 comments 数组
+    const listWithCommentCount = list.map((post) => {
+      const commentCount = post.comments?.filter((c) => !c.isDeleted).length || 0;
+      const { comments, ...postWithoutComments } = post;
+      return { ...postWithoutComments, commentCount };
+    });
+
+    return { list: listWithCommentCount, total, page, pageSize };
   }
 
   /**
@@ -89,9 +97,17 @@ export class PostService {
       skip: (page - 1) * pageSize,
       take: pageSize,
       order: { createdAt: 'DESC' },
-      relations: ['author', 'tags'],
+      relations: ['author', 'tags', 'comments'],
     });
-    return { list, total, page, pageSize };
+
+    // 添加评论数量并移除完整的 comments 数组
+    const listWithCommentCount = list.map((post) => {
+      const commentCount = post.comments?.filter((c) => !c.isDeleted).length || 0;
+      const { comments, ...postWithoutComments } = post;
+      return { ...postWithoutComments, commentCount };
+    });
+
+    return { list: listWithCommentCount, total, page, pageSize };
   }
 
   /**
