@@ -1,12 +1,14 @@
 <script lang="ts" generics="T extends Record<string, any>">
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
+	import ImagePicker from '$lib/components/ImagePicker.svelte';
 	import { toast } from '$lib/stores/toast';
+	import { ImageIcon, X } from '@lucide/svelte';
 
 	interface Field {
 		name: string;
 		label: string;
-		type: 'text' | 'textarea' | 'number' | 'select';
+		type: 'text' | 'textarea' | 'number' | 'select' | 'image';
 		placeholder?: string;
 		hint?: string;
 		required?: boolean;
@@ -38,6 +40,8 @@
 
 	let formData = $state<Record<string, any>>({});
 	let isSaving = $state(false);
+	let showImagePicker = $state(false);
+	let currentImageField = $state<string | null>(null);
 
 	$effect(() => {
 		if (open && data) {
@@ -72,6 +76,23 @@
 			open = false;
 			onClose();
 		}
+	}
+
+	function openImagePicker(fieldName: string) {
+		currentImageField = fieldName;
+		showImagePicker = true;
+	}
+
+	function handleImageSelect(url: string) {
+		if (currentImageField) {
+			formData[currentImageField] = url;
+		}
+		showImagePicker = false;
+		currentImageField = null;
+	}
+
+	function clearImage(fieldName: string) {
+		formData[fieldName] = '';
 	}
 </script>
 
@@ -134,6 +155,36 @@
 									<option value={option.value}>{option.label}</option>
 								{/each}
 							</select>
+						{:else if field.type === 'image'}
+							<div class="flex items-center gap-3">
+								{#if formData[field.name]}
+									<div class="relative">
+										<img
+											src={formData[field.name]}
+											alt={field.label}
+											class="w-16 h-16 rounded-lg object-cover border border-slate-200"
+										/>
+										<button
+											type="button"
+											onclick={() => clearImage(field.name)}
+											class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+										>
+											<X class="w-3 h-3" />
+										</button>
+									</div>
+								{:else}
+									<div class="w-16 h-16 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-400">
+										<ImageIcon class="w-6 h-6" />
+									</div>
+								{/if}
+								<Button
+									variant="outline"
+									onclick={() => openImagePicker(field.name)}
+									disabled={field.disabled}
+								>
+									选择图片
+								</Button>
+							</div>
 						{/if}
 
 						{#if field.hint}
@@ -150,3 +201,5 @@
 		</div>
 	</div>
 {/if}
+
+<ImagePicker bind:open={showImagePicker} onSelect={handleImageSelect} />

@@ -70,7 +70,7 @@
 									type="checkbox"
 									onchange={handleSelectAll}
 									checked={items.length > 0 && selectedIds.length === items.length}
-									class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+									class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0 checked:bg-emerald-600 checked:border-emerald-600"
 								/>
 							</th>
 						{/if}
@@ -86,7 +86,7 @@
 										type="checkbox"
 										checked={selectedIds.includes(item[itemKey])}
 										onchange={() => handleSelectRow(item[itemKey])}
-										class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+										class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0 checked:bg-emerald-600 checked:border-emerald-600"
 									/>
 								</td>
 							{/if}

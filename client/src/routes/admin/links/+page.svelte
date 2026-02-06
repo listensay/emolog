@@ -43,7 +43,7 @@
 	const editFields = [
 		{ name: 'name', label: '链接名称', type: 'text' as const, required: true },
 		{ name: 'url', label: '链接地址', type: 'text' as const, required: true },
-		{ name: 'icon', label: '图标地址', type: 'text' as const, hint: '可选，填写图标图片URL' },
+		{ name: 'icon', label: '图标', type: 'image' as const, hint: '可选，选择图标图片' },
 		{ name: 'description', label: '描述', type: 'textarea' as const, rows: 2, hint: '可选，简短描述' },
 		{ name: 'order', label: '排序', type: 'number' as const, min: 0, hint: '数字越小越靠前' }
 	];
