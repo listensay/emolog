@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import type { ComponentType } from 'svelte';
-	import { LayoutDashboard, FileText, FolderOpen, Tag, ImageIcon, MessageCircle, Users, Settings, File, Database } from '@lucide/svelte';
+	import { LayoutDashboard, FileText, FolderOpen, Tag, ImageIcon, MessageCircle, Users, Settings, File, Database, Link } from '@lucide/svelte';
 
 	interface MenuItem {
 		label: string;
@@ -17,6 +17,7 @@
 		{ label: '标签管理', href: '/admin/tags', icon: Tag },
 		{ label: '图片管理', href: '/admin/images', icon: ImageIcon },
 		{ label: '评论管理', href: '/admin/comments', icon: MessageCircle },
+		{ label: '友情链接', href: '/admin/links', icon: Link },
 		{ label: '用户管理', href: '/admin/users', icon: Users },
 		{ label: '配置管理', href: '/admin/configs', icon: Database },
 		{ label: '设置', href: '/admin/settings', icon: Settings }
