@@ -256,7 +256,7 @@
 									/>
 								{:else}
 									<div class="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-xl font-bold">
-										{user?.username.charAt(0).toUpperCase() || 'U'}
+										{user?.username?.charAt(0)?.toUpperCase() || '?'}
 									</div>
 								{/if}
 								<div class="flex flex-col gap-2">

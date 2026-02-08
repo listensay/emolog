@@ -26,7 +26,7 @@
 					/>
 				{:else}
 					<div class="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white text-2xl font-bold border-4 border-white shadow-lg">
-						{authState.user.username.charAt(0).toUpperCase()}
+						{authState.user.username?.charAt(0)?.toUpperCase() || '?'}
 					</div>
 				{/if}
 				<span class="absolute bottom-0 right-0 w-5 h-5 bg-green-500 border-2 border-white rounded-full"></span>
