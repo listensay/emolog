@@ -26,7 +26,7 @@
 
 <div class="menu">
 	<nav class="bg-white border-b border-slate-200">
-		<ul class="flex justify-center items-center gap-1 p-3">
+		<ul class="flex justify-center items-center gap-1 p-3 w-[1200px] mx-auto">
 			{#each menuItems as item}
 				<li class="w-full">
 					<a
