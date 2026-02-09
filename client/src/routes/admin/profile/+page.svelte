@@ -2,12 +2,19 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import Input from '$lib/components/ui/Input.svelte';
 	import ImagePicker from '$lib/components/ImagePicker.svelte';
+	import Profile from '$lib/components/layout/Profile.svelte';
 	import { toast } from '$lib/stores/toast';
 	import { auth } from '$lib/stores/auth';
+	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
 	import { getCurrentUser, updateProfile, changePassword } from '$lib/api/user';
 	import type { User, UserLink } from '$lib/api/user';
 	import { onMount } from 'svelte';
 	import { Plus, Trash2, GripVertical, Pencil } from '@lucide/svelte';
+
+	$effect(() => {
+		pageTitle.set('个人资料');
+		pageSubtitle.set('管理个人信息和密码');
+	});
 
 	let user: User | null = $state(null);
 	let isLoading = $state(true);
@@ -215,6 +222,43 @@
 		</div>
 	{:else if user}
 		<div class="space-y-6">
+				<!-- 个人资料预览 -->
+				<div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+					<Profile
+						avatar={avatar || undefined}
+						nickname={nickname || user.username}
+						profileBackground={profileBackground || undefined}
+						{links}
+						showMenu={false}
+					/>
+					<div class="flex justify-center gap-3 p-4">
+						<Button variant="outline" onclick={() => avatarPickerOpen = true}>
+							更换头像
+						</Button>
+						<Button variant="outline" onclick={() => backgroundPickerOpen = true}>
+							更换背景图
+						</Button>
+						{#if avatar}
+							<button
+								type="button"
+								onclick={() => avatar = ''}
+								class="text-sm text-red-600 hover:text-red-700 px-3"
+							>
+								移除头像
+							</button>
+						{/if}
+						{#if profileBackground}
+							<button
+								type="button"
+								onclick={() => profileBackground = ''}
+								class="text-sm text-red-600 hover:text-red-700 px-3"
+							>
+								移除背景图
+							</button>
+						{/if}
+					</div>
+				</div>
+
 				<!-- 基本资料 -->
 				<div class="bg-white rounded-xl border border-slate-200 p-6">
 					<h3 class="text-lg font-semibold text-slate-900 mb-4">基本资料</h3>
@@ -243,72 +287,6 @@
 							error={profileErrors.nickname}
 							placeholder="请输入昵称"
 						/>
-
-						<!-- 头像选择 -->
-						<div>
-							<label class="block text-sm font-medium text-slate-700 mb-2">头像</label>
-							<div class="flex items-center gap-4">
-								{#if avatar}
-									<img
-										src={avatar}
-										alt="头像预览"
-										class="w-16 h-16 rounded-full object-cover border border-slate-200"
-									/>
-								{:else}
-									<div class="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-xl font-bold">
-										{user?.username?.charAt(0)?.toUpperCase() || '?'}
-									</div>
-								{/if}
-								<div class="flex flex-col gap-2">
-									<Button variant="outline" onclick={() => avatarPickerOpen = true}>
-										选择图片
-									</Button>
-									{#if avatar}
-										<button
-											type="button"
-											onclick={() => avatar = ''}
-											class="text-sm text-red-600 hover:text-red-700"
-										>
-											移除头像
-										</button>
-									{/if}
-								</div>
-							</div>
-						</div>
-
-						<!-- 背景图选择 -->
-						<div>
-							<label class="block text-sm font-medium text-slate-700 mb-2">个人资料背景图</label>
-							<div class="space-y-3">
-								{#if profileBackground}
-									<div class="relative w-full h-32 rounded-lg overflow-hidden border border-slate-200">
-										<img
-											src={profileBackground}
-											alt="背景图预览"
-											class="w-full h-full object-cover"
-										/>
-									</div>
-								{:else}
-									<div class="w-full h-32 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white">
-										<span class="text-sm">默认渐变背景</span>
-									</div>
-								{/if}
-								<div class="flex gap-2">
-									<Button variant="outline" onclick={() => backgroundPickerOpen = true}>
-										选择背景图
-									</Button>
-									{#if profileBackground}
-										<button
-											type="button"
-											onclick={() => profileBackground = ''}
-											class="text-sm text-red-600 hover:text-red-700 px-3"
-										>
-											移除背景图
-										</button>
-									{/if}
-								</div>
-							</div>
-						</div>
 
 						<div class="pt-2">
 							<Button onclick={handleSaveProfile} loading={isSavingProfile}>

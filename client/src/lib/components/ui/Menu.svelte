@@ -25,7 +25,7 @@
 </script>
 
 <div class="menu">
-	<nav class="bg-white rounded-b-xl border border-slate-200">
+	<nav class="bg-white border-b border-slate-200">
 		<ul class="flex justify-center items-center gap-1 p-3">
 			{#each menuItems as item}
 				<li class="w-full">

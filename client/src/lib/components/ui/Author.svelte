@@ -8,9 +8,9 @@ const configState = $derived($siteConfig);
 <div>
   <div class="flex justify-center flex-col items-center">
     {#if configState.config.site_logo}
-      <img class="w-26 mb-2 rounded-full jelly border-4 border-white/50 shadow-lg" src={configState.config.site_logo} alt={configState.config.site_title}>
+      <img class="w-26 mb-4 rounded-full jelly shadow-lg" src={configState.config.site_logo} alt={configState.config.site_title}>
     {:else}
-      <img class="w-26 mb-2 rounded-full jelly border-4 border-white/50 shadow-lg" src={avatar} alt={configState.config.site_title}>
+      <img class="w-26 mb-4 rounded-full jelly shadow-lg" src={avatar} alt={configState.config.site_title}>
     {/if}
     <div>
       <div class="text-xl font-medium text-white drop-shadow-md">{configState.config.site_title}</div>

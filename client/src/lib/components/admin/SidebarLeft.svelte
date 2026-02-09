@@ -42,7 +42,7 @@
 				<li>
 					<a
 						href={item.href}
-						class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 {isActive(
+						class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm {isActive(
 							item.href
 						)
 							? 'bg-emerald-600 text-white'

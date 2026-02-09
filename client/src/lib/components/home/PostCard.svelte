@@ -19,15 +19,15 @@
 
 {#if post.cover}
 	<!-- 缩略图样式：有封面 -->
-	<article class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+	<article class="bg-white rounded-xl border border-slate-200 overflow-hidden p-4">
 		<a href="/posts/{post.id}" class="flex">
 			<!-- 左侧缩略图 -->
-			<div class="w-48 min-h-36 shrink-0">
+			<div class="w-48 min-h-36 shrink-0 rounded-xl overflow-hidden">
 				<img src={post.cover} alt={post.title} class="w-full h-full object-cover" />
 			</div>
 
 			<!-- 右侧内容 -->
-			<div class="flex-1 p-5 flex flex-col justify-between min-w-0">
+			<div class="flex-1 p-5 py-0 flex flex-col justify-between min-w-0">
 				<div>
 					<!-- 标签 -->
 					{#if post.tags && post.tags.length > 0}

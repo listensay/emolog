@@ -45,8 +45,11 @@
 	</header>
 
 	<!-- 用户资料 -->
-	<div class="flex-1 w-full max-w-[800px] mx-auto px-4 lg:px-0">
-		<Profile />
+	<div>
+			<Profile />
+		</div>
+	<div class="flex-1 w-full max-w-[1200px] mx-auto px-4 lg:px-0">
+
 
 		<!-- 主内容区 -->
 		<main class="flex-1 py-6 lg:p-6 lg:px-0 overflow-auto">
