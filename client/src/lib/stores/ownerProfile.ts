@@ -5,6 +5,7 @@ export interface OwnerProfile {
 	nickname?: string;
 	avatar?: string;
 	profileBackground?: string;
+	bio?: string;
 	links?: Array<{ order: number; icon: string; name: string; url: string }>;
 }
 

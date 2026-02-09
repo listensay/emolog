@@ -23,6 +23,7 @@
 
 	// 基本资料表单
 	let nickname = $state('');
+	let bio = $state('');
 	let avatar = $state('');
 	let profileBackground = $state('');
 
@@ -58,6 +59,7 @@
 			const response = await getCurrentUser();
 			user = response.data;
 			nickname = user.nickname || '';
+			bio = user.bio || '';
 			avatar = user.avatar || '';
 			profileBackground = user.profileBackground || '';
 			links = user.links || [];
@@ -76,6 +78,7 @@
 		try {
 			const response = await updateProfile({
 				nickname,
+				bio: bio || undefined,
 				avatar: avatar || undefined,
 				profileBackground: profileBackground || undefined,
 				links: links.length > 0 ? links : undefined
@@ -141,6 +144,7 @@
 		try {
 			await updateProfile({
 				nickname,
+				bio: bio || undefined,
 				avatar: avatar || undefined,
 				profileBackground: profileBackground || undefined,
 				links: links.length > 0 ? links : undefined
@@ -227,6 +231,7 @@
 					<Profile
 						avatar={avatar || undefined}
 						nickname={nickname || user.username}
+						bio={bio || undefined}
 						profileBackground={profileBackground || undefined}
 						{links}
 						showMenu={false}
@@ -286,6 +291,12 @@
 							bind:value={nickname}
 							error={profileErrors.nickname}
 							placeholder="请输入昵称"
+						/>
+
+						<Input
+							label="个性签名"
+							bind:value={bio}
+							placeholder="请输入个性签名"
 						/>
 
 						<div class="pt-2">

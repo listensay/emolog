@@ -21,6 +21,7 @@ export interface User {
 	nickname: string | null;
 	avatar: string | null;
 	profileBackground: string | null;
+	bio: string | null;
 	links: UserLink[] | null;
 	isActive: boolean;
 	createdAt: string;
@@ -56,6 +57,7 @@ export interface UpdateProfileParams {
 	nickname?: string;
 	avatar?: string;
 	profileBackground?: string;
+	bio?: string;
 	links?: UserLink[];
 }
 

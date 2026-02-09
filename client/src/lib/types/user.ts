@@ -12,6 +12,7 @@ export interface User {
 	nickname?: string;
 	avatar?: string;
 	profileBackground?: string;
+	bio?: string;
 	links?: Array<{ order: number; icon: string; name: string; url: string }>;
 	isActive?: boolean;
 	createdAt?: string;

@@ -8,12 +8,13 @@
 	interface Props {
 		avatar?: string;
 		nickname?: string;
+		bio?: string;
 		profileBackground?: string;
 		links?: Array<{ order: number; icon: string; name: string; url: string }>;
 		showMenu?: boolean;
 	}
 
-	let { avatar, nickname, profileBackground, links, showMenu = true }: Props = $props();
+	let { avatar, nickname, bio, profileBackground, links, showMenu = true }: Props = $props();
 
 	const profileState = $derived($ownerProfile);
 	const configState = $derived($siteConfig);
@@ -22,6 +23,7 @@
 	const displayLinks = $derived(links ?? profileState.profile.links);
 	const displayAvatar = $derived(avatar ?? configState.config.site_logo);
 	const displayNickname = $derived(nickname ?? configState.config.site_title);
+	const displayBio = $derived(bio ?? profileState.profile.bio);
 </script>
 
 <!-- 资料区域 -->
@@ -50,10 +52,16 @@
 					src={displayAvatar || defaultAvatar}
 					alt={displayNickname}
 				/>
-				<div class="text-xl font-medium text-white drop-shadow-md">{displayNickname}</div>
+				<div class="text-2xl font-medium text-white drop-shadow-md">123123 {displayNickname}</div>
+				{#if displayBio}
+					<div class="text-xl text-white/80 mt-1 drop-shadow-md">{displayBio}</div>
+				{/if}
 			</div>
 		{:else}
 			<Author />
+			{#if displayBio}
+				<div class="text-white/80 mt-2 text-center drop-shadow-md">{displayBio}</div>
+			{/if}
 		{/if}
 
 		<!-- 用户 Links -->

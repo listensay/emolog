@@ -13,7 +13,7 @@ const configState = $derived($siteConfig);
       <img class="w-26 mb-4 rounded-full jelly shadow-lg" src={avatar} alt={configState.config.site_title}>
     {/if}
     <div>
-      <div class="text-xl font-medium text-white drop-shadow-md">{configState.config.site_title}</div>
+      <div class="text-2xl font-medium text-white drop-shadow-md">{configState.config.site_title}</div>
     </div>
   </div>
 </div>

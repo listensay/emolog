@@ -58,6 +58,16 @@ export class UpdateProfileDto {
   profileBackground?: string;
 
   @ApiProperty({
+    description: '个性签名',
+    required: false,
+    example: '热爱生活，热爱代码',
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200, { message: '个性签名最多200个字符' })
+  bio?: string;
+
+  @ApiProperty({
     description: 'Links列表',
     required: false,
     type: [LinkDto],

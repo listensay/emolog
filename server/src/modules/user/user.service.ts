@@ -143,6 +143,7 @@ export class UserService {
       nickname?: string;
       avatar?: string;
       profileBackground?: string;
+      bio?: string;
       links?: Array<{ order: number; icon: string; name: string; url: string }>;
     },
   ): Promise<User> {
@@ -155,6 +156,9 @@ export class UserService {
     }
     if (updateData.profileBackground !== undefined) {
       user.profileBackground = updateData.profileBackground;
+    }
+    if (updateData.bio !== undefined) {
+      user.bio = updateData.bio;
     }
     if (updateData.links !== undefined) {
       user.links = updateData.links;
@@ -179,6 +183,7 @@ export class UserService {
       nickname: user.nickname,
       avatar: user.avatar,
       profileBackground: user.profileBackground,
+      bio: user.bio,
       links: user.links,
     };
   }
