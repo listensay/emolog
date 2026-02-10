@@ -27,7 +27,7 @@
 			</div>
 
 			<!-- 右侧内容 -->
-			<div class="flex-1 p-5 py-0 flex flex-col justify-between min-w-0">
+			<div class="flex-1 p-5 pr-0 py-0 flex flex-col justify-between min-w-0">
 				<div>
 					<!-- 标签 -->
 					{#if post.tags && post.tags.length > 0}
@@ -69,10 +69,6 @@
 					</div>
 
 					<div class="flex items-center gap-3">
-						<span class="flex items-center gap-1">
-							<Eye class="w-4 h-4" />
-							{post.views}
-						</span>
 						<span class="flex items-center gap-1">
 							<MessageCircle class="w-4 h-4" />
 							{post.commentCount || 0}
@@ -132,16 +128,12 @@
 
 				<div class="flex items-center gap-3">
 					<span class="flex items-center gap-1">
-						<Eye class="w-4 h-4" />
-						{post.views}
+						<Heart class="w-4 h-4" />
+						{post.likes}
 					</span>
 					<span class="flex items-center gap-1">
 						<MessageCircle class="w-4 h-4" />
 						{post.commentCount || 0}
-					</span>
-					<span class="flex items-center gap-1">
-						<Heart class="w-4 h-4" />
-						{post.likes}
 					</span>
 				</div>
 			</div>
