@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Post } from '$lib/api/post';
-	import { User, Calendar, Eye, Heart, MessageCircle } from '@lucide/svelte';
+	import { User, Calendar, Heart, MessageCircle } from '@lucide/svelte';
 
 	interface Props {
 		post: Post;

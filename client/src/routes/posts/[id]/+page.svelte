@@ -166,22 +166,6 @@
 
 			<!-- 元信息 -->
 			<div class="flex flex-wrap items-center gap-3 md:gap-4 text-sm text-slate-500">
-				{#if post.author}
-					<span class="flex items-center gap-2">
-						{#if post.author.avatar}
-							<img
-								src={post.author.avatar}
-								alt={post.author.nickname || post.author.username}
-								class="w-8 h-8 rounded-full object-cover"
-							/>
-						{:else}
-							<div class="w-8 h-8 rounded-full bg-linear-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm font-medium">
-								{(post.author.nickname || post.author.username)?.charAt(0).toUpperCase() || 'U'}
-							</div>
-						{/if}
-						{post.author.nickname || post.author.username}
-					</span>
-				{/if}
 				<span class="flex items-center gap-1">
 					<Calendar class="w-4 h-4" />
 					{formatDate(post.createdAt)}
@@ -204,8 +188,16 @@
 			</div>
 		</div>
 
-		<!-- 文章底部操作 -->
-		<div class="mt-8 flex items-center justify-between">
+		<!-- 文章底部信息 -->
+		<div class="mt-8 space-y-4">
+			<!-- 更新时间 -->
+			{#if post.updatedAt !== post.createdAt}
+				<div class="text-sm text-slate-400">
+					更新于 {formatDate(post.updatedAt)}
+				</div>
+			{/if}
+
+			<!-- 点赞和评论 -->
 			<div class="flex items-center gap-4">
 				<!-- 点赞按钮 -->
 				<button
@@ -228,13 +220,6 @@
 					<span class="text-sm">({commentTotal})</span>
 				</a>
 			</div>
-
-			<!-- 更新时间 -->
-			{#if post.updatedAt !== post.createdAt}
-				<span class="text-sm text-slate-400">
-					更新于 {formatDate(post.updatedAt)}
-				</span>
-			{/if}
 		</div>
 
 		<!-- 评论区 -->
