@@ -145,7 +145,7 @@
 						/>
 					{:else}
 						<div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-medium">
-							{user.username.charAt(0).toUpperCase()}
+							{user.username?.charAt(0)?.toUpperCase() || '?'}
 						</div>
 					{/if}
 					<div>

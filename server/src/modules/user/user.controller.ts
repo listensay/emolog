@@ -91,6 +91,14 @@ export class UserController {
     return user;
   }
 
+  @Public()
+  @Get('profile/owner')
+  @ApiOperation({ summary: '获取博主公开资料' })
+  @ApiResponse({ status: 200, description: '获取成功' })
+  async getOwnerProfile() {
+    return await this.userService.getOwnerProfile();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: '获取用户详情' })
   @ApiResponse({ status: 200, description: '获取成功' })

@@ -20,6 +20,7 @@ export interface Post {
 	views: number;
 	likes: number;
 	type: number;
+	commentCount?: number;
 	author?: any;
 	tags?: Tag[];
 }

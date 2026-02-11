@@ -30,6 +30,15 @@ export class User {
   @Column({ nullable: true, length: 255 })
   avatar?: string;
 
+  @Column({ nullable: true, length: 500 })
+  profileBackground?: string;
+
+  @Column({ nullable: true, length: 200 })
+  bio?: string;
+
+  @Column({ nullable: true, type: 'json' })
+  links?: Array<{ order: number; icon: string; name: string; url: string }>;
+
   @Column({ default: true })
   isActive: boolean;
 

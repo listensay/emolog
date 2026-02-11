@@ -310,7 +310,7 @@
 							type="checkbox"
 							checked={selectedImages.length === images.length && images.length > 0}
 							onchange={handleSelectAll}
-							class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+							class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0 checked:bg-emerald-600 checked:border-emerald-600"
 						/>
 						<span class="text-sm text-slate-600">全选</span>
 					</label>
@@ -330,7 +330,7 @@
 									type="checkbox"
 									checked={selectedImages.includes(image.id)}
 									onchange={() => handleSelectImage(image.id)}
-									class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 bg-white"
+									class="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-0 checked:bg-emerald-600 checked:border-emerald-600"
 								/>
 							</div>
 

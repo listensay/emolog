@@ -32,6 +32,17 @@ if (existsSync(envProductionPath)) {
   }
 }
 
+// 创建 package.json 启动脚本
+const packageJson = {
+  name: 'emolog-client',
+  type: 'module',
+  scripts: {
+    start: 'node --env-file=.env index.js'
+  }
+};
+writeFileSync(resolve(buildDir, 'package.json'), JSON.stringify(packageJson, null, 2) + '\n');
+console.log('已创建 package.json');
+
 const buildInfo = JSON.parse(readFileSync(buildJsonPath, 'utf-8'));
 
 // 版本号 +1（语义化版本，patch +1）
@@ -61,3 +72,4 @@ buildInfo.history.push({
 writeFileSync(buildJsonPath, JSON.stringify(buildInfo, null, 2) + '\n');
 
 console.log(`构建完成: builds/${zipName} (v${newVersion})`);
+console.log('部署方式: 解压后运行 npm start');

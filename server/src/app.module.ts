@@ -11,6 +11,7 @@ import { TagModule } from './modules/tag/tag.module';
 import { ImageModule } from './modules/image/image.module';
 import { CommentModule } from './modules/comment/comment.module';
 import { SiteConfigModule } from './modules/config/config.module';
+import { LinkModule } from './modules/link/link.module';
 import { User } from './modules/user/entities/user.entity';
 import { Post } from './modules/post/entities/post.entity';
 import { Category } from './modules/category/entities/category.entity';
@@ -18,13 +19,19 @@ import { Tag } from './modules/tag/entities/tag.entity';
 import { Image } from './modules/image/entities/image.entity';
 import { Comment } from './modules/comment/entities/comment.entity';
 import { Config } from './modules/config/entities/config.entity';
+import { Link } from './modules/link/entities/link.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      // 根据 NODE_ENV 加载对应的环境变量文件
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
-      isGlobal: true, // 使配置在整个应用中可用
+      // dev 加载 .env.development，prod 加载 .env.production，其他加载 .env
+      envFilePath:
+        process.env.NODE_ENV === 'development'
+          ? '.env.development'
+          : process.env.NODE_ENV === 'production'
+            ? '.env.production'
+            : '.env',
+      isGlobal: true,
     }),
     // 静态文件服务，用于图片访问
     ServeStaticModule.forRoot({
@@ -40,7 +47,7 @@ import { Config } from './modules/config/entities/config.entity';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
-        entities: [User, Post, Category, Tag, Image, Comment, Config],
+        entities: [User, Post, Category, Tag, Image, Comment, Config, Link],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -53,6 +60,7 @@ import { Config } from './modules/config/entities/config.entity';
     ImageModule,
     CommentModule,
     SiteConfigModule,
+    LinkModule,
   ],
 })
 export class AppModule {}

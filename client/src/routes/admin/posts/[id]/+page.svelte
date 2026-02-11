@@ -7,10 +7,16 @@
 	import { getAllCategories, CategoryType, type Category } from '$lib/api/category';
 	import { getAllTags, type Tag } from '$lib/api/tag';
 	import type { Post } from '$lib/api/post';
+	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
 	import { onMount } from 'svelte';
 
 	let post: Post | null = $state(null);
 	let title = $state('');
+
+	$effect(() => {
+		pageTitle.set(title ? `编辑: ${title}` : '编辑文章');
+		pageSubtitle.set('');
+	});
 	let description = $state('');
 	let content = $state('');
 	let categoryId = $state('');
@@ -72,7 +78,7 @@
 			await updatePost(post.id, {
 				title: title.trim(),
 				content,
-				cover: coverImage || undefined,
+				cover: coverImage || null,
 				description: description.trim() || undefined,
 				categoryId: parseInt(categoryId) || 1,
 				tagIds: selectedTagIds

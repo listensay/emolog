@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Author from '$lib/components/ui/Author.svelte';
-	import Menu from '$lib/components/ui/Menu.svelte';
+	import Profile from '$lib/components/layout/Profile.svelte';
 	import { siteConfig } from '$lib/stores/siteConfig';
 	import avatar from '$lib/assets/avatar.png';
 	import { ChevronLeft } from '@lucide/svelte';
@@ -23,7 +22,7 @@
 
 <div class="flex flex-col min-h-screen">
 	<!-- 移动端顶部栏 -->
-	<header class="lg:hidden sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200">
+	<header class="lg:hidden sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200 z-[999]">
 		<div class="flex items-center justify-between px-4 py-3">
 			{#if showBackButton}
 				<button onclick={goBack} class="flex items-center gap-1 text-slate-600">
@@ -34,28 +33,21 @@
 				<div class="w-16"></div>
 			{/if}
 			<a href="/" class="flex items-center gap-2">
-				{#if configState.config.site_logo}
-					<img class="w-8 h-8 rounded-full" src={configState.config.site_logo} alt={configState.config.site_title}>
-				{:else}
-					<img class="w-8 h-8 rounded-full" src={avatar} alt={configState.config.site_title}>
-				{/if}
 				<span class="font-medium text-slate-900">{configState.config.site_title}</span>
 			</a>
 			<div class="w-16"></div>
 		</div>
 	</header>
 
-	<div class="flex flex-1 w-full max-w-[1200px] mx-auto px-4 lg:px-0">
-		<!-- 侧边栏 - 移动端隐藏 -->
-		<aside class="hidden lg:block sticky top-0 h-screen w-64 shrink-0">
-			<div class="pt-20 mb-5">
-				<Author />
-			</div>
-			<Menu />
-		</aside>
+	<!-- 用户资料 -->
+	<div>
+			<Profile />
+		</div>
+	<div class="flex-1 w-full max-w-[1200px] mx-auto px-4 lg:px-0">
+
 
 		<!-- 主内容区 -->
-		<main class="flex-1 py-6 lg:p-6 overflow-auto">
+		<main class="flex-1 py-6 lg:p-6 lg:px-0 overflow-auto">
 			{@render children()}
 		</main>
 	</div>

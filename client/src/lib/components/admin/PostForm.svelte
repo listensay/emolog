@@ -215,7 +215,7 @@
 							variant="outline"
 							onclick={handleCreateTag}
 							loading={isCreatingTag}
-							class="text-sm px-3 py-1.5"
+							class="text-sm px-3 py-1.5 shrink-0"
 						>
 							添加
 						</Button>

@@ -6,7 +6,7 @@ import { env } from '$env/dynamic/private';
  */
 const getServerApiUrl = () => {
 	// 使用 SERVER_URL 环境变量（运行时设置）
-	return env.SERVER_URL || 'http://127.0.0.1:8088';
+	return env.SERVER_URL;
 };
 
 /**
@@ -63,4 +63,22 @@ export async function getPostListSSR(page = 1, pageSize = 10) {
  */
 export async function getConfigsSSR() {
 	return serverFetch<{ data: Record<string, string>; success: boolean }>('/config');
+}
+
+/**
+ * 博主公开资料类型
+ */
+export interface OwnerProfile {
+	id: number;
+	nickname?: string;
+	avatar?: string;
+	profileBackground?: string;
+	links?: Array<{ order: number; icon: string; name: string; url: string }>;
+}
+
+/**
+ * 获取博主公开资料 (SSR)
+ */
+export async function getOwnerProfileSSR() {
+	return serverFetch<{ data: OwnerProfile; success: boolean }>('/user/profile/owner');
 }

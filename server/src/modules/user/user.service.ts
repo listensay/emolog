@@ -139,7 +139,13 @@ export class UserService {
    */
   async updateProfile(
     id: number,
-    updateData: { nickname?: string; avatar?: string },
+    updateData: {
+      nickname?: string;
+      avatar?: string;
+      profileBackground?: string;
+      bio?: string;
+      links?: Array<{ order: number; icon: string; name: string; url: string }>;
+    },
   ): Promise<User> {
     const user = await this.findOne(id);
     if (updateData.nickname !== undefined) {
@@ -148,6 +154,37 @@ export class UserService {
     if (updateData.avatar !== undefined) {
       user.avatar = updateData.avatar;
     }
+    if (updateData.profileBackground !== undefined) {
+      user.profileBackground = updateData.profileBackground;
+    }
+    if (updateData.bio !== undefined) {
+      user.bio = updateData.bio;
+    }
+    if (updateData.links !== undefined) {
+      user.links = updateData.links;
+    }
     return await this.userRepository.save(user);
+  }
+
+  /**
+   * 获取博主公开资料（最近活跃的用户）
+   */
+  async getOwnerProfile(): Promise<Partial<User> | null> {
+    const user = await this.userRepository.findOne({
+      where: { isActive: true },
+      order: { updatedAt: 'DESC' },
+    });
+    if (!user) {
+      return null;
+    }
+    // 只返回公开信息
+    return {
+      id: user.id,
+      nickname: user.nickname,
+      avatar: user.avatar,
+      profileBackground: user.profileBackground,
+      bio: user.bio,
+      links: user.links,
+    };
   }
 }

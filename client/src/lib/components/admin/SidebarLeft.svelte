@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import type { ComponentType } from 'svelte';
-	import { LayoutDashboard, FileText, FolderOpen, Tag, ImageIcon, MessageCircle, Users, Settings, File } from '@lucide/svelte';
+	import { LayoutDashboard, FileText, FolderOpen, Tag, ImageIcon, MessageCircle, Users, Settings, File, Database, Link } from '@lucide/svelte';
 
 	interface MenuItem {
 		label: string;
@@ -17,7 +17,9 @@
 		{ label: '标签管理', href: '/admin/tags', icon: Tag },
 		{ label: '图片管理', href: '/admin/images', icon: ImageIcon },
 		{ label: '评论管理', href: '/admin/comments', icon: MessageCircle },
+		{ label: '友情链接', href: '/admin/links', icon: Link },
 		{ label: '用户管理', href: '/admin/users', icon: Users },
+		{ label: '配置管理', href: '/admin/configs', icon: Database },
 		{ label: '设置', href: '/admin/settings', icon: Settings }
 	];
 
@@ -40,7 +42,7 @@
 				<li>
 					<a
 						href={item.href}
-						class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 {isActive(
+						class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-sm {isActive(
 							item.href
 						)
 							? 'bg-emerald-600 text-white'
@@ -57,7 +59,7 @@
 	<!-- Footer -->
 	<div class="p-4 border-t border-slate-800">
 		<div class="text-xs text-slate-500 text-center">
-			© 2024 Emolog
+			© 2026 Emolog
 		</div>
 	</div>
 </aside>

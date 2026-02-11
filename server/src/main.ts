@@ -9,6 +9,12 @@ import { json, urlencoded } from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // 启用 CORS
+  app.enableCors({
+    origin: true, // 允许所有来源，生产环境建议配置具体域名
+    credentials: true,
+  });
+
   // 增加请求体大小限制
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ extended: true, limit: '50mb' }));
@@ -41,7 +47,7 @@ async function bootstrap() {
     SwaggerModule.setup('api', app, document);
   }
 
-  await app.listen(process.env.PORT ?? 8088, '0.0.0.0');
+  await app.listen(process.env.PORT ?? 8080, '0.0.0.0');
   console.log(`Application is running on: ${await app.getUrl()}`);
   if (process.env.NODE_ENV !== 'production') {
     console.log(`Swagger UI is running on: ${await app.getUrl()}/api`);

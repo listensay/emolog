@@ -3,12 +3,14 @@ import './layout.css';
 import favicon from '$lib/assets/favicon.svg';
 import ToastContainer from '$lib/components/ui/ToastContainer.svelte';
 import { siteConfig } from '$lib/stores/siteConfig';
+import { ownerProfile, type OwnerProfile } from '$lib/stores/ownerProfile';
 import { onMount } from 'svelte';
 import type { SiteConfig } from '$lib/api/config';
 
 interface Props {
 	data: {
 		siteConfig: SiteConfig;
+		ownerProfile: OwnerProfile | null;
 	};
 	children: any;
 }
@@ -22,6 +24,9 @@ const configState = $derived($siteConfig);
 onMount(() => {
 	if (data.siteConfig) {
 		siteConfig.updateConfig(data.siteConfig);
+	}
+	if (data.ownerProfile) {
+		ownerProfile.setProfile(data.ownerProfile);
 	}
 });
 

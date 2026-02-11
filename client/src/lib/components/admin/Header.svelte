@@ -66,7 +66,7 @@
 								/>
 							{:else}
 								<div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
-									{authState.user.username.charAt(0).toUpperCase()}
+									{authState.user.username?.charAt(0)?.toUpperCase() || '?'}
 								</div>
 							{/if}
 						</a>

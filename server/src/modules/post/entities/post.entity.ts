@@ -6,11 +6,13 @@ import {
   UpdateDateColumn,
   ManyToOne,
   ManyToMany,
+  OneToMany,
   JoinColumn,
   JoinTable,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Tag } from '../../tag/entities/tag.entity';
+import { Comment } from '../../comment/entities/comment.entity';
 
 @Entity('posts')
 export class Post {
@@ -70,4 +72,7 @@ export class Post {
     inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' },
   })
   tags: Tag[];
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments: Comment[];
 }

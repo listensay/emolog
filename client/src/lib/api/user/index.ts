@@ -2,6 +2,16 @@ import { request } from '$lib/utils/request';
 import type { ApiResponse, PaginationResponse } from '$lib/types';
 
 /**
+ * Link 类型
+ */
+export interface UserLink {
+	order: number;
+	icon: string;
+	name: string;
+	url: string;
+}
+
+/**
  * 用户类型
  */
 export interface User {
@@ -10,6 +20,9 @@ export interface User {
 	email: string;
 	nickname: string | null;
 	avatar: string | null;
+	profileBackground: string | null;
+	bio: string | null;
+	links: UserLink[] | null;
 	isActive: boolean;
 	createdAt: string;
 	updatedAt: string;
@@ -43,6 +56,9 @@ export interface UpdateUserParams {
 export interface UpdateProfileParams {
 	nickname?: string;
 	avatar?: string;
+	profileBackground?: string;
+	bio?: string;
+	links?: UserLink[];
 }
 
 /**
