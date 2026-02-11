@@ -33,11 +33,6 @@
 				<div class="w-16"></div>
 			{/if}
 			<a href="/" class="flex items-center gap-2">
-				{#if configState.config.site_logo}
-					<img class="w-8 h-8 rounded-full" src={configState.config.site_logo} alt={configState.config.site_title}>
-				{:else}
-					<img class="w-8 h-8 rounded-full" src={avatar} alt={configState.config.site_title}>
-				{/if}
 				<span class="font-medium text-slate-900">{configState.config.site_title}</span>
 			</a>
 			<div class="w-16"></div>
