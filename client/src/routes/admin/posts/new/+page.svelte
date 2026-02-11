@@ -6,7 +6,13 @@
 	import { getAllCategories, CategoryType, type Category } from '$lib/api/category';
 	import { getAllTags, type Tag } from '$lib/api/tag';
 	import { auth } from '$lib/stores/auth';
+	import { pageTitle, pageSubtitle } from '$lib/stores/admin';
 	import { onMount } from 'svelte';
+
+	$effect(() => {
+		pageTitle.set('新建文章');
+		pageSubtitle.set('');
+	});
 
 	let title = $state('');
 	let description = $state('');
