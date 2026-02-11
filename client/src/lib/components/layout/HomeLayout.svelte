@@ -22,7 +22,7 @@
 
 <div class="flex flex-col min-h-screen">
 	<!-- 移动端顶部栏 -->
-	<header class="lg:hidden sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200">
+	<header class="lg:hidden sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-slate-200 z-[999]">
 		<div class="flex items-center justify-between px-4 py-3">
 			{#if showBackButton}
 				<button onclick={goBack} class="flex items-center gap-1 text-slate-600">

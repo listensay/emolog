@@ -42,22 +42,22 @@
 	{/if}
 
 	<!-- 资料内容 -->
-	<div class="relative z-10 pt-40 mb-6">
-		<div class="flex w-[1200px] mx-auto">
+	<div class="relative z-10 pt-20 md:pt-40 mb-6 px-4">
+		<div class="flex flex-col items-center md:flex-row md:items-start max-w-[1200px] w-full mx-auto">
 			<img
-				class="w-32 mr-4 rounded-full jelly shadow-lg"
+				class="w-20 md:w-32 mb-2 md:mb-0 md:mr-4 rounded-full jelly shadow-lg"
 				src={displayAvatar || defaultAvatar}
 				alt={displayNickname}
 			/>
-			<div class="flex flex-col justify-center">
-				<div class="text-2xl font-medium text-white drop-shadow-md">{displayNickname}</div>
+			<div class="flex flex-col items-center md:items-start md:justify-center">
+				<div class="text-xl md:text-2xl font-medium text-white drop-shadow-md">{displayNickname}</div>
 				{#if displayBio}
-				<div class="text-white/80 mt-2 drop-shadow-md">{displayBio}</div>
+				<div class="text-white/80 mt-2 drop-shadow-md text-sm md:text-base">{displayBio}</div>
 				{/if}
 
 				<!-- 用户 Links -->
 				{#if displayLinks && displayLinks.length > 0}
-					<div class="flex gap-3 mt-2 flex-wrap">
+					<div class="flex gap-3 mt-2 flex-wrap justify-center md:justify-start">
 						{#each displayLinks.toSorted((a, b) => a.order - b.order) as link}
 							<a
 								href={link.url}

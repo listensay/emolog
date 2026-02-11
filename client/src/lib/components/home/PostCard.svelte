@@ -22,12 +22,12 @@
 	<article class="bg-white rounded-xl border border-slate-200 overflow-hidden p-4">
 		<a href="/posts/{post.id}" class="flex">
 			<!-- 左侧缩略图 -->
-			<div class="w-48 min-h-36 shrink-0 rounded-xl overflow-hidden">
+			<div class="w-24 min-h-24 md:w-48 md:min-h-36 shrink-0 rounded-xl overflow-hidden">
 				<img src={post.cover} alt={post.title} class="w-full h-full object-cover" />
 			</div>
 
 			<!-- 右侧内容 -->
-			<div class="flex-1 p-5 pr-0 py-0 flex flex-col justify-between min-w-0">
+			<div class="flex-1 pl-3 md:pl-5 flex flex-col justify-between min-w-0">
 				<div>
 					<!-- 标签 -->
 					{#if post.tags && post.tags.length > 0}
@@ -41,13 +41,13 @@
 					{/if}
 
 					<!-- 标题 -->
-					<h2 class="text-lg font-semibold text-slate-900 mb-2 line-clamp-2">
+					<h2 class="text-base md:text-lg font-semibold text-slate-900 mb-1 md:mb-2 line-clamp-2">
 						{post.title}
 					</h2>
 
 					<!-- 描述 -->
 					{#if post.description}
-						<p class="text-slate-600 text-sm mb-3 line-clamp-2">
+						<p class="text-slate-600 text-sm mb-3 line-clamp-1 md:line-clamp-2">
 							{post.description}
 						</p>
 					{/if}
@@ -57,7 +57,7 @@
 				<div class="flex items-center justify-between text-xs text-slate-500">
 					<div class="flex items-center gap-3">
 						{#if post.author}
-							<span class="flex items-center gap-1">
+							<span class="hidden md:flex items-center gap-1">
 								<User class="w-4 h-4" />
 								{post.author.nickname || post.author.username}
 							</span>
